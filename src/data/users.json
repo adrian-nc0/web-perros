@@ -2,14 +2,14 @@
   {
     "id": "user-1",
     "name": "Administrador",
-    "carnet": "1234567",
+    "email": "admin@ejemplo.com",
     "password": "admin123",
     "role": "ADMIN"
   },
   {
     "id": "user-2",
     "name": "Usuario de prueba",
-    "carnet": "7654321",
+    "email": "usuario@ejemplo.com",
     "password": "usuario123",
     "role": "USUARIO"
   }
