@@ -34,11 +34,22 @@ function LoginForm({ error, onSubmit }: LoginFormProps) {
 
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Iniciar sesión</h1>
+    <form className="login-form" onSubmit={handleSubmit}>
+      <div className="form-heading">
+        <span className="form-paw" aria-hidden="true">🐶</span>
+        <div>
+          <p className="form-kicker">Bienvenido de vuelta</p>
+          <h2>Iniciar sesión</h2>
+        </div>
+      </div>
+      <p className="form-description">Ingresa tus datos para continuar cuidando historias.</p>
 
+
+
+      <div className="form-field">
 
       <div>
+
         <label htmlFor="email">Correo electrónico</label>
 
 
@@ -55,7 +66,7 @@ function LoginForm({ error, onSubmit }: LoginFormProps) {
       </div>
 
 
-      <div>
+      <div className="form-field">
         <label htmlFor="password">Contraseña</label>
 
 
@@ -73,13 +84,17 @@ function LoginForm({ error, onSubmit }: LoginFormProps) {
 
 
       {error && (
-        <p role="alert" aria-live="polite">
+        <p className="form-error" role="alert" aria-live="polite">
           {error}
         </p>
       )}
 
 
-      <button type="submit">Ingresar</button>
+      <button className="login-submit" type="submit">
+        Entrar a la comunidad <span aria-hidden="true">→</span>
+      </button>
+
+      <p className="form-footer">Cada adopción transforma dos vidas. <span aria-hidden="true">♥</span></p>
     </form>
   );
 }
