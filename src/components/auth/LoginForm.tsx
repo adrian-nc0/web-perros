@@ -45,7 +45,11 @@ function LoginForm({ error, onSubmit }: LoginFormProps) {
       <p className="form-description">Ingresa tus datos para continuar cuidando historias.</p>
 
 
+
       <div className="form-field">
+
+      <div>
+
         <label htmlFor="email">Correo electrónico</label>
 
 
