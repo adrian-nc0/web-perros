@@ -10,7 +10,7 @@ interface LoginFormProps {
 
 
 function LoginForm({ error, onSubmit }: LoginFormProps) {
-  const [carnet, setCarnet] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
 
@@ -18,44 +18,51 @@ function LoginForm({ error, onSubmit }: LoginFormProps) {
     event.preventDefault();
 
 
-    const normalizedCarnet = carnet.trim();
+    const normalizedEmail = email.trim().toLowerCase();
 
 
-    if (!normalizedCarnet || !password) {
+    if (!normalizedEmail || !password) {
       return;
     }
 
 
     onSubmit({
-      carnet: normalizedCarnet,
+      email: normalizedEmail,
       password,
     });
   };
 
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Iniciar sesión</h1>
+    <form className="login-form" onSubmit={handleSubmit}>
+      <div className="form-heading">
+        <span className="form-paw" aria-hidden="true">🐶</span>
+        <div>
+          <p className="form-kicker">Bienvenido de vuelta</p>
+          <h2>Iniciar sesión</h2>
+        </div>
+      </div>
+      <p className="form-description">Ingresa tus datos para continuar cuidando historias.</p>
 
 
-      <div>
-        <label htmlFor="carnet">Carnet de identidad</label>
+      <div className="form-field">
+        <label htmlFor="email">Correo electrónico</label>
 
 
         <input
-          id="carnet"
-          name="carnet"
-          type="text"
-          value={carnet}
-          onChange={(event) => setCarnet(event.target.value)}
-          placeholder="Ingrese su carnet"
-          autoComplete="username"
+          id="email"
+          name="email"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="Ingrese su correo electrónico"
+          autoComplete="email"
           required
         />
       </div>
 
 
-      <div>
+      <div className="form-field">
         <label htmlFor="password">Contraseña</label>
 
 
@@ -73,13 +80,17 @@ function LoginForm({ error, onSubmit }: LoginFormProps) {
 
 
       {error && (
-        <p role="alert" aria-live="polite">
+        <p className="form-error" role="alert" aria-live="polite">
           {error}
         </p>
       )}
 
 
-      <button type="submit">Ingresar</button>
+      <button className="login-submit" type="submit">
+        Entrar a la comunidad <span aria-hidden="true">→</span>
+      </button>
+
+      <p className="form-footer">Cada adopción transforma dos vidas. <span aria-hidden="true">♥</span></p>
     </form>
   );
 }
