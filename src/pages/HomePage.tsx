@@ -23,7 +23,7 @@ function HomePage() {
       {user ? (
         <>
           <p>Bienvenido, {user.name}</p>
-          <p>Carnet: {user.carnet}</p>
+          <p>Correo electrónico: {user.email}</p>
           <p>Rol: {user.role}</p>
 
 
