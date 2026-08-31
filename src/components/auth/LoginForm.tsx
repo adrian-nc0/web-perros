@@ -2,36 +2,23 @@ import { useState } from "react";
 import type { FormEventHandler } from "react";
 import type { LoginCredentials } from "../../types/auth";
 
-
 interface LoginFormProps {
   error?: string;
   onSubmit: (credentials: LoginCredentials) => void;
 }
 
-
 function LoginForm({ error, onSubmit }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-
   const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
-
-
     const normalizedEmail = email.trim().toLowerCase();
 
-
-    if (!normalizedEmail || !password) {
-      return;
+    if (normalizedEmail && password) {
+      onSubmit({ email: normalizedEmail, password });
     }
-
-
-    onSubmit({
-      email: normalizedEmail,
-      password,
-    });
   };
-
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>
@@ -44,60 +31,19 @@ function LoginForm({ error, onSubmit }: LoginFormProps) {
       </div>
       <p className="form-description">Ingresa tus datos para continuar cuidando historias.</p>
 
-
-
       <div className="form-field">
-
-      <div>
-
         <label htmlFor="email">Correo electrónico</label>
-
-
-        <input
-          id="email"
-          name="email"
-          type="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="Ingrese su correo electrónico"
-          autoComplete="email"
-          required
-        />
+        <input id="email" name="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="tu@correo.com" autoComplete="email" required />
       </div>
-
-
       <div className="form-field">
         <label htmlFor="password">Contraseña</label>
-
-
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="Ingrese su contraseña"
-          autoComplete="current-password"
-          required
-        />
+        <input id="password" name="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Tu contraseña" autoComplete="current-password" required />
       </div>
-
-
-      {error && (
-        <p className="form-error" role="alert" aria-live="polite">
-          {error}
-        </p>
-      )}
-
-
-      <button className="login-submit" type="submit">
-        Entrar a la comunidad <span aria-hidden="true">→</span>
-      </button>
-
-      <p className="form-footer">Cada adopción transforma dos vidas. <span aria-hidden="true">♥</span></p>
+      {error && <p className="form-error" role="alert" aria-live="polite">{error}</p>}
+      <button className="login-submit" type="submit">Entrar a la comunidad <span aria-hidden="true">→</span></button>
+      <p className="form-footer">Demo: usuario@ejemplo.com / usuario123 <span aria-hidden="true">♥</span></p>
     </form>
   );
 }
-
 
 export default LoginForm;
