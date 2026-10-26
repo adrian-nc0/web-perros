@@ -5,7 +5,7 @@ import { authRepository } from "../repositories/authRepository";
 import { animalRepository, isCloudCatalogEnabled } from "../repositories/animalRepository";
 import type { Animal, AnimalFormData, AnimalType } from "../types/animal";
 
-type AdminSection = "resumen" | "mascotas" | "solicitudes";
+type AdminSection = "resumen" | "mascotas";
 
 const emptyForm: AnimalFormData = {
   name: "",
@@ -171,7 +171,6 @@ function AdminPage() {
         <nav className="admin-nav" aria-label="Menú de administración">
           <button className={section === "resumen" ? "active" : ""} onClick={() => { setSection("resumen"); setFormOpen(false); }}><span>▦</span> Resumen</button>
           <button className={section === "mascotas" ? "active" : ""} onClick={() => { setSection("mascotas"); setFormOpen(false); }}><span>🐾</span> Mascotas <small>{animals.length}</small></button>
-          <button className={section === "solicitudes" ? "active" : ""} onClick={() => { setSection("solicitudes"); setFormOpen(false); }}><span>♡</span> Solicitudes <small>—</small></button>
         </nav>
         <div className="admin-sidebar-bottom">
           <div className="admin-user-avatar">A</div>
@@ -182,7 +181,7 @@ function AdminPage() {
 
       <section className="admin-main">
         <header className="admin-topbar">
-          <div><p className="admin-breadcrumb">HUELLAS A CASA <span>/</span> ADMINISTRACIÓN</p><h1>{section === "resumen" ? "Panel de control" : section === "mascotas" ? "Gestión de mascotas" : "Solicitudes de adopción"}</h1></div>
+          <div><p className="admin-breadcrumb">HUELLAS A CASA <span>/</span> ADMINISTRACIÓN</p><h1>{section === "resumen" ? "Panel de control" : "Gestión de mascotas"}</h1></div>
           <div className="admin-topbar-right"><span className="admin-live-dot" /> <span>Sucre, Bolivia</span><button onClick={handleLogout}>Cerrar sesión ↗</button></div>
         </header>
 
@@ -252,12 +251,6 @@ function AdminPage() {
           </div>
         )}
 
-        {section === "solicitudes" && (
-          <div className="admin-content">
-            <div className="admin-section-heading"><div><h2>Solicitudes de adopción</h2><p>Seguimiento de las personas interesadas en adoptar.</p></div></div>
-            <div className="admin-requests-empty"><span aria-hidden="true">♡</span><h2>El seguimiento aún no está conectado</h2><p>Por ahora, la ficha de cada mascota abre WhatsApp con un mensaje preparado. Esa conversación ocurre fuera del sitio y no se registra automáticamente en este panel.</p><div><strong>Función pendiente</strong><br />En una siguiente etapa se puede crear un formulario de adopción y guardar cada solicitud en una base de datos para revisar su estado desde aquí.</div></div>
-          </div>
-        )}
       </section>
     </main>
   );
