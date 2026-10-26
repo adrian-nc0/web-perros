@@ -38,10 +38,6 @@ function AdminPage() {
     [animals, search],
   );
 
-  if (!user || user.role !== "ADMIN") {
-    return <Navigate to="/login" replace />;
-  }
-
   const refreshAnimals = async () => {
     try {
       setAnimals(await animalRepository.getAll());
@@ -56,6 +52,10 @@ function AdminPage() {
     const interval = window.setInterval(() => void refreshAnimals(), 10000);
     return () => window.clearInterval(interval);
   }, []);
+
+  if (!user || user.role !== "ADMIN") {
+    return <Navigate to="/login" replace />;
+  }
 
   const openNewForm = () => {
     setEditingId(null);
