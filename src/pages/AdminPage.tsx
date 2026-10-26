@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { authRepository } from "../repositories/authRepository";
@@ -22,7 +22,8 @@ function AdminPage() {
   const navigate = useNavigate();
   const user = authRepository.getCurrentUser();
   const [section, setSection] = useState<AdminSection>("resumen");
-  const [animals, setAnimals] = useState<Animal[]>(() => animalRepository.getAll());
+  const [animals, setAnimals] = useState<Animal[]>([]);
+  const [catalogError, setCatalogError] = useState("");
   const [search, setSearch] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -41,7 +42,20 @@ function AdminPage() {
     return <Navigate to="/login" replace />;
   }
 
-  const refreshAnimals = () => setAnimals(animalRepository.getAll());
+  const refreshAnimals = async () => {
+    try {
+      setAnimals(await animalRepository.getAll());
+      setCatalogError("");
+    } catch (error) {
+      setCatalogError(error instanceof Error ? error.message : "No se pudo conectar con el catálogo compartido.");
+    }
+  };
+
+  useEffect(() => {
+    void refreshAnimals();
+    const interval = window.setInterval(() => void refreshAnimals(), 10000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   const openNewForm = () => {
     setEditingId(null);
@@ -102,7 +116,7 @@ function AdminPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData: AnimalFormData = {
       ...form,
@@ -114,23 +128,30 @@ function AdminPage() {
       tags: Array.isArray(form.tags) ? form.tags : [],
     };
 
-    if (editingId !== null) {
-      animalRepository.update({ ...formData, id: editingId });
-      setNotice("Los datos de la mascota se actualizaron.");
-    } else {
-      animalRepository.create(formData);
-      setNotice("La mascota se registró correctamente.");
+    try {
+      if (editingId !== null) {
+        await animalRepository.update({ ...formData, id: editingId });
+        setNotice("Los datos de la mascota se actualizaron.");
+      } else {
+        await animalRepository.create(formData);
+        setNotice("La mascota se registró correctamente.");
+      }
+      await refreshAnimals();
+      setFormOpen(false);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "No se pudo guardar la mascota. Revisa la conexión con la base de datos.");
     }
-
-    refreshAnimals();
-    setFormOpen(false);
   };
 
-  const handleDelete = (animal: Animal) => {
+  const handleDelete = async (animal: Animal) => {
     if (!window.confirm(`¿Seguro que quieres eliminar a ${animal.name} del catálogo?`)) return;
-    animalRepository.remove(animal.id);
-    refreshAnimals();
-    setNotice(`${animal.name} fue eliminado del catálogo.`);
+    try {
+      await animalRepository.remove(animal.id);
+      await refreshAnimals();
+      setNotice(`${animal.name} fue eliminado del catálogo.`);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "No se pudo eliminar la mascota.");
+    }
   };
 
   const handleLogout = () => {
@@ -163,6 +184,7 @@ function AdminPage() {
           <div className="admin-topbar-right"><span className="admin-live-dot" /> <span>Sucre, Bolivia</span><button onClick={handleLogout}>Cerrar sesión ↗</button></div>
         </header>
 
+        {catalogError && <div className="admin-notice" role="alert"><span>!</span>{catalogError}<button onClick={() => setCatalogError("")} aria-label="Cerrar aviso">×</button></div>}
         {notice && <div className="admin-notice" role="status"><span>✓</span>{notice}<button onClick={() => setNotice("")} aria-label="Cerrar aviso">×</button></div>}
 
         {section === "resumen" && (
@@ -173,7 +195,7 @@ function AdminPage() {
             </div>
             <div className="admin-section-heading"><div><h2>Vista general</h2><p>Un resumen del catálogo actual.</p></div><button className="admin-primary-button" onClick={() => { setSection("mascotas"); openNewForm(); }}>＋ Registrar mascota</button></div>
             <div className="admin-stat-grid">
-              <article className="admin-stat-card"><span className="admin-stat-icon green">🐾</span><div><p>Mascotas en catálogo</p><strong>{animals.length}</strong><small>Perfiles registrados en este navegador</small></div></article>
+              <article className="admin-stat-card"><span className="admin-stat-icon green">🐾</span><div><p>Mascotas en catálogo</p><strong>{animals.length}</strong><small>Perfiles compartidos en el catálogo</small></div></article>
               <article className="admin-stat-card"><span className="admin-stat-icon peach">🐶</span><div><p>Perros</p><strong>{dogs}</strong><small>En búsqueda de una familia</small></div></article>
               <article className="admin-stat-card"><span className="admin-stat-icon yellow">🐱</span><div><p>Gatos</p><strong>{cats}</strong><small>En búsqueda de una familia</small></div></article>
             </div>
@@ -223,7 +245,7 @@ function AdminPage() {
               {filteredAnimals.map((animal) => <article className="admin-table-row" key={animal.id}><div className="admin-table-animal"><img src={animal.image} alt="" /><div><strong>{animal.name}</strong><small>{animal.location}</small></div></div><span><i className={animal.type === "Perro" ? "species-dot dog" : "species-dot cat"} />{animal.type}</span><span>{animal.age}</span><span>{animal.size}</span><div className="admin-row-actions"><button onClick={() => openEditForm(animal)} aria-label={`Editar a ${animal.name}`} title="Editar">✎</button><button className="delete" onClick={() => handleDelete(animal)} aria-label={`Eliminar a ${animal.name}`} title="Eliminar">⌫</button></div></article>)}
               {filteredAnimals.length === 0 && <p className="admin-empty">No se encontraron mascotas. Prueba otra búsqueda o registra una nueva.</p>}
             </div>
-            <p className="admin-demo-note">Los cambios se guardan en este navegador y aparecerán en la página de adopción al volver a cargarla en este mismo navegador.</p>
+            <p className="admin-demo-note">Los cambios se guardan en la base de datos compartida y se reflejan en el catálogo de todos los dispositivos en unos segundos.</p>
           </div>
         )}
 
