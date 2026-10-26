@@ -40,8 +40,8 @@ function LoginForm({ error, onSubmit }: LoginFormProps) {
         <input id="password" name="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Tu contraseña" autoComplete="current-password" required />
       </div>
       {error && <p className="form-error" role="alert" aria-live="polite">{error}</p>}
-      <button className="login-submit" type="submit">Entrar a la comunidad <span aria-hidden="true">→</span></button>
-      <p className="form-footer">Demo: usuario@ejemplo.com / usuario123 <span aria-hidden="true">♥</span></p>
+      <button className="login-submit" type="submit">Entrar como administrador <span aria-hidden="true">→</span></button>
+      <p className="form-footer">Acceso de demostración: admin@ejemplo.com / admin123 <span aria-hidden="true">♥</span></p>
     </form>
   );
 }
