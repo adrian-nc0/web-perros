@@ -28,6 +28,7 @@ function AdminPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<AnimalFormData>(emptyForm);
   const [notice, setNotice] = useState("");
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
 
   const dogs = animals.filter((animal) => animal.type === "Perro").length;
   const cats = animals.filter((animal) => animal.type === "Gato").length;
@@ -63,6 +64,27 @@ function AdminPage() {
     });
     setFormOpen(true);
     setNotice("");
+  };
+
+  const handleImageFile = (file?: File) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setNotice("Selecciona un archivo de imagen válido.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setNotice("La foto debe pesar menos de 2 MB. Prueba una imagen más pequeña.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setForm((previous) => ({ ...previous, image: reader.result as string }));
+        setNotice("");
+      }
+    };
+    reader.onerror = () => setNotice("No se pudo leer la foto. Intenta con otro archivo.");
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -161,7 +183,20 @@ function AdminPage() {
                 <label>Especie<select value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value as AnimalType })}><option>Perro</option><option>Gato</option></select></label>
                 <label>Edad aproximada<input required value={form.age} onChange={(event) => setForm({ ...form, age: event.target.value })} placeholder="Ej. 1 año" /></label>
                 <label>Tamaño<select value={form.size} onChange={(event) => setForm({ ...form, size: event.target.value })}><option>Pequeño</option><option>Mediano</option><option>Grande</option></select></label>
-                <label className="wide">URL de la fotografía<input required type="url" value={form.image} onChange={(event) => setForm({ ...form, image: event.target.value })} placeholder="https://..." /></label>
+                <div className="wide admin-photo-field">
+                  <span className="admin-photo-label">Fotografía de la mascota</span>
+                  <label
+                    className={`admin-photo-dropzone ${isDraggingImage ? "dragging" : ""} ${form.image ? "has-image" : ""}`}
+                    onDragOver={(event) => { event.preventDefault(); setIsDraggingImage(true); }}
+                    onDragLeave={() => setIsDraggingImage(false)}
+                    onDrop={(event) => { event.preventDefault(); setIsDraggingImage(false); handleImageFile(event.dataTransfer.files[0]); }}
+                  >
+                    {form.image ? <img className="admin-photo-preview" src={form.image} alt="Vista previa de la mascota" /> : <span className="admin-photo-placeholder">📷</span>}
+                    <span className="admin-photo-instructions"><strong>{form.image ? "Cambiar fotografía" : "Arrastra la foto aquí"}</strong><small>o haz clic para elegir una imagen de tu dispositivo</small><small>JPG, PNG o WEBP · máximo 2 MB</small></span>
+                    <input className="admin-photo-input" required={!form.image} type="file" accept="image/*" onChange={(event) => { handleImageFile(event.target.files?.[0]); event.currentTarget.value = ""; }} />
+                  </label>
+                  {form.image && <button type="button" className="admin-remove-photo" onClick={() => setForm({ ...form, image: "" })}>Quitar fotografía</button>}
+                </div>
                 <label className="wide">Historia o descripción<textarea required minLength={10} rows={3} value={form.story} onChange={(event) => setForm({ ...form, story: event.target.value })} placeholder="Describe su personalidad y lo que necesita..." /></label>
                 <label className="wide">Características (separadas por coma)<input value={Array.isArray(form.tags) ? form.tags.join(", ") : form.tags} onChange={(event) => setForm({ ...form, tags: event.target.value.split(",").map((tag) => tag.trim()).filter(Boolean) })} placeholder="Cariñoso, Juguetón" /></label>
               </div>
