@@ -34,7 +34,7 @@ function HomePage() {
   const [selected, setSelected] = useState<Animal | null>(null);
   const visibleAnimals = useMemo(() => animals.filter((animal) => (filter === "Todos" || animal.type === filter) && `${animal.name} ${animal.location}`.toLocaleLowerCase().includes(search.toLocaleLowerCase())), [filter, search]);
 
-  const handleLogout = () => { authRepository.logout(); navigate("/login", { replace: true }); };
+  const handleLogout = () => { authRepository.logout(); navigate("/", { replace: true }); };
   const openAdoption = (animal: Animal) => { setSelected(animal); };
 
   return (
