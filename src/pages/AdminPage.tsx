@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { authRepository } from "../repositories/authRepository";
 import { animalRepository } from "../repositories/animalRepository";
@@ -28,16 +29,16 @@ function AdminPage() {
   const [form, setForm] = useState<AnimalFormData>(emptyForm);
   const [notice, setNotice] = useState("");
 
-  if (!user || user.role !== "ADMIN") {
-    return <Navigate to="/login" replace />;
-  }
-
   const dogs = animals.filter((animal) => animal.type === "Perro").length;
   const cats = animals.filter((animal) => animal.type === "Gato").length;
   const filteredAnimals = useMemo(
     () => animals.filter((animal) => `${animal.name} ${animal.type}`.toLowerCase().includes(search.toLowerCase())),
     [animals, search],
   );
+
+  if (!user || user.role !== "ADMIN") {
+    return <Navigate to="/login" replace />;
+  }
 
   const refreshAnimals = () => setAnimals(animalRepository.getAll());
 
@@ -64,7 +65,7 @@ function AdminPage() {
     setNotice("");
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData: AnimalFormData = {
       ...form,
