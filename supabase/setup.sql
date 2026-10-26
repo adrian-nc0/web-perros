@@ -11,8 +11,11 @@ create table if not exists public.animals (
   image text not null,
   story text not null,
   tags jsonb not null default '[]'::jsonb,
+  health_care jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now()
 );
+
+alter table public.animals add column if not exists health_care jsonb not null default '[]'::jsonb;
 
 alter table public.animals enable row level security;
 
@@ -65,15 +68,22 @@ on storage.objects for select
 to anon, authenticated
 using (bucket_id = 'animal-photos');
 
+-- Completa los datos de salud de los perfiles de demostración existentes.
+-- Solo aplica a las fotos de ejemplo incluidas en este proyecto.
+update public.animals set health_care = '["Desparasitación registrada","Control veterinario realizado"]'::jsonb where name = 'Milo' and image like '%photo-1558788353-f76d92427f16%' and health_care = '[]'::jsonb;
+update public.animals set health_care = '["Vacunación registrada"]'::jsonb where name = 'Luna' and image like '%photo-1514888286974-6c03e2ca1dba%' and health_care = '[]'::jsonb;
+update public.animals set health_care = '["Desparasitación registrada"]'::jsonb where name = 'Nala' and image like '%photo-1495360010541-f48722b34f7d%' and health_care = '[]'::jsonb;
+update public.animals set health_care = '["Vacunación registrada","Desparasitación registrada"]'::jsonb where name = 'Toby' and image like '%photo-1543466835-00a7907e9de1%' and health_care = '[]'::jsonb;
+
 -- Datos de ejemplo solo para un proyecto nuevo (no duplica si ya existen por nombre).
-insert into public.animals (name, type, age, size, location, image, story, tags)
-select v.name, v.type, v.age, v.size, 'Sucre, Bolivia', v.image, v.story, v.tags::jsonb
+insert into public.animals (name, type, age, size, location, image, story, tags, health_care)
+select v.name, v.type, v.age, v.size, 'Sucre, Bolivia', v.image, v.story, v.tags::jsonb, v.health_care::jsonb
 from (values
- ('Milo','Perro','2 años','Mediano','https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=900&q=85','Curioso, cariñoso y siempre listo para una aventura.','["Sociable","Energético"]'),
- ('Luna','Gato','1 año','Pequeño','https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=85','Una compañera tranquila que adora las siestas al sol.','["Tranquila","Hogar"]'),
- ('Bruno','Perro','4 años','Grande','https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=900&q=85','Noble y leal; busca una familia con mucho amor.','["Cariñoso","Paseos"]'),
- ('Nala','Gato','3 años','Mediano','https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=900&q=85','Dulce e independiente, con un ronroneo inolvidable.','["Mimos","Adaptable"]'),
- ('Toby','Perro','8 meses','Pequeño','https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85','Un pequeño explorador que llenará tu casa de alegría.','["Cachorro","Juguetón"]'),
- ('Simba','Gato','2 años','Mediano','https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=85','Observador y afectuoso cuando gana confianza.','["Curioso","Interior"]')
-) as v(name, type, age, size, image, story, tags)
+ ('Milo','Perro','2 años','Mediano','https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=900&q=85','Curioso, cariñoso y siempre listo para una aventura.','["Sociable","Energético"]', '["Desparasitación registrada","Control veterinario realizado"]'),
+ ('Luna','Gato','1 año','Pequeño','https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=85','Una compañera tranquila que adora las siestas al sol.','["Tranquila","Hogar"]', '["Vacunación registrada"]'),
+ ('Bruno','Perro','4 años','Grande','https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=900&q=85','Noble y leal; busca una familia con mucho amor.','["Cariñoso","Paseos"]', '[]'),
+ ('Nala','Gato','3 años','Mediano','https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=900&q=85','Dulce e independiente, con un ronroneo inolvidable.','["Mimos","Adaptable"]', '["Desparasitación registrada"]'),
+ ('Toby','Perro','8 meses','Pequeño','https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85','Un pequeño explorador que llenará tu casa de alegría.','["Cachorro","Juguetón"]', '["Vacunación registrada","Desparasitación registrada"]'),
+ ('Simba','Gato','2 años','Mediano','https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=85','Observador y afectuoso cuando gana confianza.','["Curioso","Interior"]', '[]')
+) as v(name, type, age, size, image, story, tags, health_care)
 where not exists (select 1 from public.animals existing where existing.name = v.name);
