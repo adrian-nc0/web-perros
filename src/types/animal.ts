@@ -10,6 +10,7 @@ export interface Animal {
   image: string;
   story: string;
   tags: string[];
+  healthCare?: string[];
 }
 
 export type AnimalFormData = Omit<Animal, "id">;
