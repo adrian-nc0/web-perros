@@ -1064,3 +1064,7 @@ footer { display: flex; padding: 28px clamp(24px, 7vw, 112px); align-items: cent
   .role-option-copy strong { font-size: .84rem; }
   .role-option-copy small { font-size: .72rem; }
 }
+
+
+/* Ocultar la ilustración del perro y el gato en la selección de perfil */
+.role-pet-scene { display: none !important; }
