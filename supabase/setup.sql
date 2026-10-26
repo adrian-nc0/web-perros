@@ -17,6 +17,7 @@ create table if not exists public.animals (
 alter table public.animals enable row level security;
 
 -- Catálogo público: cualquiera puede leer las mascotas.
+drop policy if exists "Public can read animals" on public.animals;
 create policy "Public can read animals"
 on public.animals for select
 to anon, authenticated
@@ -27,17 +28,20 @@ using (true);
 -- panel actual pueda escribir, pero NO son adecuadas para producción.
 -- Para publicar en producción, integrar Supabase Auth y restringir escrituras
 -- a usuarios administradores autenticados antes de habilitar estas políticas.
+drop policy if exists "Demo app can insert animals" on public.animals;
 create policy "Demo app can insert animals"
 on public.animals for insert
 to anon, authenticated
 with check (true);
 
+drop policy if exists "Demo app can update animals" on public.animals;
 create policy "Demo app can update animals"
 on public.animals for update
 to anon, authenticated
 using (true)
 with check (true);
 
+drop policy if exists "Demo app can delete animals" on public.animals;
 create policy "Demo app can delete animals"
 on public.animals for delete
 to anon, authenticated
@@ -49,11 +53,13 @@ values ('animal-photos', 'animal-photos', true, 2097152, array['image/jpeg', 'im
 on conflict (id) do update set public = true;
 
 -- Política de demostración para que el panel pueda subir fotos sin sesión real.
+drop policy if exists "Demo app can upload animal photos" on storage.objects;
 create policy "Demo app can upload animal photos"
 on storage.objects for insert
 to anon, authenticated
 with check (bucket_id = 'animal-photos');
 
+drop policy if exists "Public can view animal photos" on storage.objects;
 create policy "Public can view animal photos"
 on storage.objects for select
 to anon, authenticated
