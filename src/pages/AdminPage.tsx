@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { authRepository } from "../repositories/authRepository";
-import { animalRepository } from "../repositories/animalRepository";
+import { animalRepository, isCloudCatalogEnabled } from "../repositories/animalRepository";
 import type { Animal, AnimalFormData, AnimalType } from "../types/animal";
 
 type AdminSection = "resumen" | "mascotas" | "solicitudes";
@@ -213,7 +213,7 @@ function AdminPage() {
         {section === "mascotas" && (
           <div className="admin-content">
             <div className="admin-section-heading admin-list-heading"><div><h2>Catálogo de mascotas</h2><p>Registra y actualiza los perfiles que se muestran a los adoptantes.</p></div><button className="admin-primary-button" onClick={openNewForm}>＋ Nueva mascota</button></div>
-            <div className="admin-table-tools"><label><span>⌕</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por nombre o especie..." /></label><span>{filteredAnimals.length} resultados</span></div>
+            <div className="admin-table-tools"><label><span aria-hidden="true">⌕</span><input aria-label="Buscar mascotas por nombre o especie" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por nombre o especie..." /></label><span>{filteredAnimals.length} resultados</span></div>
 
             {formOpen && <form className="admin-animal-form" onSubmit={handleSubmit}>
               <div className="admin-form-heading"><div><p>{editingId !== null ? "ACTUALIZAR PERFIL" : "NUEVO PERFIL"}</p><h3>{editingId !== null ? "Editar mascota" : "Registrar una mascota"}</h3></div><button type="button" onClick={() => setFormOpen(false)} aria-label="Cerrar formulario">×</button></div>
@@ -248,14 +248,14 @@ function AdminPage() {
               {filteredAnimals.map((animal) => <article className="admin-table-row" key={animal.id}><div className="admin-table-animal"><img src={animal.image} alt="" /><div><strong>{animal.name}</strong><small>{animal.location}</small></div></div><span><i className={animal.type === "Perro" ? "species-dot dog" : "species-dot cat"} />{animal.type}</span><span>{animal.age}</span><span>{animal.size}</span><div className="admin-row-actions"><button onClick={() => openEditForm(animal)} aria-label={`Editar a ${animal.name}`} title="Editar">✎</button><button className="delete" onClick={() => handleDelete(animal)} aria-label={`Eliminar a ${animal.name}`} title="Eliminar">⌫</button></div></article>)}
               {filteredAnimals.length === 0 && <p className="admin-empty">No se encontraron mascotas. Prueba otra búsqueda o registra una nueva.</p>}
             </div>
-            <p className="admin-demo-note">Los cambios se guardan en la base de datos compartida y se reflejan en el catálogo de todos los dispositivos en unos segundos.</p>
+            <p className="admin-demo-note">{isCloudCatalogEnabled ? "El catálogo está configurado para usar Supabase. Comprueba que la conexión y los permisos estén activos para compartir cambios entre dispositivos." : "Modo local: los cambios se guardan en este navegador y no se sincronizan con otros dispositivos. Para compartir el catálogo, configura Supabase."}</p>
           </div>
         )}
 
         {section === "solicitudes" && (
           <div className="admin-content">
             <div className="admin-section-heading"><div><h2>Solicitudes de adopción</h2><p>Seguimiento de las personas interesadas en adoptar.</p></div></div>
-            <div className="admin-requests-empty"><span>♡</span><h2>Aún no hay solicitudes registradas</h2><p>Actualmente, el formulario de adopción abre WhatsApp con un mensaje preparado. Por eso, las conversaciones no se guardan en este panel.</p><div><strong>Próxima mejora</strong><br />Conectar un formulario y una base de datos para registrar cada solicitud, consultar su estado y dar seguimiento desde aquí.</div></div>
+            <div className="admin-requests-empty"><span aria-hidden="true">♡</span><h2>El seguimiento aún no está conectado</h2><p>Por ahora, la ficha de cada mascota abre WhatsApp con un mensaje preparado. Esa conversación ocurre fuera del sitio y no se registra automáticamente en este panel.</p><div><strong>Función pendiente</strong><br />En una siguiente etapa se puede crear un formulario de adopción y guardar cada solicitud en una base de datos para revisar su estado desde aquí.</div></div>
           </div>
         )}
       </section>
