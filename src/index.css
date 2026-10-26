@@ -580,3 +580,98 @@ footer { display: flex; padding: 28px clamp(24px, 7vw, 112px); align-items: cent
     font-size: 1.55rem;
   }
 }
+
+
+/* Rediseño de la pantalla inicial de Huellas a Casa */
+.role-page {
+  position: relative;
+  isolation: isolate;
+  padding: clamp(18px, 4vw, 54px);
+  background:
+    radial-gradient(ellipse at 8% 8%, rgba(243, 201, 119, .28), transparent 30%),
+    radial-gradient(ellipse at 95% 90%, rgba(214, 111, 84, .12), transparent 28%),
+    #f7f5ee;
+}
+.role-shell {
+  width: min(100%, 1100px);
+  min-height: 650px;
+  grid-template-columns: 1.02fr .98fr;
+  border-color: rgba(48, 83, 61, .08);
+  border-radius: 28px;
+  box-shadow: 0 30px 90px rgba(38, 65, 47, .13);
+}
+.role-brand {
+  position: relative;
+  min-height: 650px;
+  padding: clamp(30px, 5vw, 58px);
+  overflow: hidden;
+  background: linear-gradient(145deg, #2e6049 0%, #234b39 100%);
+}
+.role-brand::before,
+.role-brand::after {
+  position: absolute;
+  z-index: -0;
+  content: "";
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.role-brand::before { width: 440px; height: 440px; right: -230px; top: 70px; }
+.role-brand::after { width: 300px; height: 300px; right: -160px; top: 140px; }
+.role-topline { display: flex; gap: 12px; align-items: center; margin-bottom: 45px; }
+.role-brand-mark { width: 44px; height: 44px; margin: 0; border-radius: 14px; font-size: 22px; box-shadow: 0 8px 18px rgba(0,0,0,.1); }
+.role-brand-name { color: #fffdf7; font-family: Georgia, serif; font-size: 1.25rem; letter-spacing: -.03em; }
+.role-brand-name b { color: #f4ce7b; font-weight: 500; }
+.role-eyebrow { margin-bottom: 15px; font-size: .65rem; letter-spacing: .15em; }
+.role-brand h1 { max-width: 430px; font-size: clamp(2.8rem, 4.5vw, 4.2rem); line-height: .99; }
+.role-brand h1 em { color: #f4ce7b; font-weight: 400; font-style: normal; }
+.role-brand-copy { max-width: 385px; margin: 20px 0 0; color: #dbe8dc; font-size: .94rem; line-height: 1.75; }
+.role-pet-scene { position: relative; height: 190px; margin-top: 10px; }
+.role-sun { position: absolute; top: 18px; left: 50%; width: 155px; height: 155px; border-radius: 50%; background: #f2cf83; opacity: .98; transform: translateX(-50%); }
+.role-pet-circle { position: absolute; top: 37px; left: 50%; display: flex; width: 225px; height: 126px; gap: 5px; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,.42); border-radius: 100px 100px 35px 35px; background: rgba(255,255,255,.15); backdrop-filter: blur(3px); transform: translateX(-50%); }
+.role-pet-dog { font-size: 5.6rem; transform: rotate(-7deg) translateY(4px); }
+.role-pet-cat { font-size: 4.4rem; transform: rotate(7deg) translateY(10px); }
+.role-floating-paw { position: absolute; color: #f5d58f; }
+.paw-one { top: 26px; right: 18%; font-size: 1.4rem; transform: rotate(20deg); }
+.paw-two { top: 68px; left: 16%; font-size: 1.5rem; }
+.role-pet-caption { position: absolute; right: 0; bottom: -5px; display: flex; gap: 10px; width: min(100%, 270px); padding: 12px 15px; align-items: center; border: 1px solid rgba(255,255,255,.17); border-radius: 14px; background: rgba(255,255,255,.12); backdrop-filter: blur(8px); }
+.role-pet-caption > span { color: #f4ce7b; font-size: 1.45rem; }
+.role-pet-caption p { margin: 0; color: white; font-size: .78rem; line-height: 1.4; }
+.role-pet-caption small { display: block; margin-top: 3px; color: #dbe8dc; font-size: .66rem; }
+.role-location { display: flex; gap: 8px; margin-top: 23px; align-items: center; color: #c3d7c6; font-size: .72rem; }
+.role-location span { color: #f4ce7b; font-size: 1rem; }
+.role-options { padding: clamp(30px, 5vw, 62px); background: #fffefa; }
+.role-step { color: #d16e53; font-size: .64rem; font-weight: 900; letter-spacing: .13em; }
+.role-options h2 { margin: 13px 0 0; color: #294b39; font-family: Georgia, serif; font-size: clamp(2rem, 3vw, 2.7rem); font-weight: 500; letter-spacing: -.045em; line-height: 1.1; }
+.role-subtitle { margin: 12px 0 30px; color: #7b877d; font-size: .9rem; }
+.role-option { gap: 14px; margin-bottom: 15px; padding: 19px 16px; border-color: #e8e9df; border-radius: 16px; box-shadow: 0 4px 12px rgba(40, 66, 47, .025); }
+.role-adopter { background: #fbfdf8; }
+.role-icon { width: 48px; height: 48px; flex-basis: 48px; border-radius: 14px; font-size: 1.7rem; }
+.role-adopter .role-icon { background: #e9f3e5; }
+.role-admin .role-icon { background: #fff0e8; }
+.role-option-copy { gap: 5px; }
+.role-option-copy strong { color: #2e503d; font-size: .98rem; }
+.role-option-copy small { font-size: .75rem; line-height: 1.5; }
+.role-option-tag { margin-top: 4px; color: #8a9b89; font-size: .56rem; font-weight: 900; letter-spacing: .09em; }
+.role-arrow { align-self: flex-start; font-size: 1.1rem; transition: transform .18s ease; }
+.role-option:hover .role-arrow { transform: translate(2px, -2px); }
+.role-trust-note { display: flex; gap: 11px; margin-top: 18px; padding: 14px; align-items: flex-start; border-radius: 12px; background: #f3f6ed; }
+.role-trust-note > span { display: grid; width: 23px; height: 23px; flex: 0 0 23px; place-items: center; border-radius: 50%; color: white; background: #67936a; font-size: .75rem; font-weight: 900; }
+.role-trust-note p { margin: 0; color: #758274; font-size: .72rem; line-height: 1.55; }
+.role-trust-note strong { color: #3d6147; }
+.role-note { margin-top: 18px; font-size: .68rem; }
+.role-option:focus-visible { outline: 3px solid #e9bd65; outline-offset: 3px; }
+@media (max-width: 760px) {
+  .role-shell { min-height: 0; }
+  .role-brand { min-height: 0; padding: 28px 25px 22px; }
+  .role-topline { margin-bottom: 32px; }
+  .role-brand h1 { font-size: clamp(2.5rem, 9vw, 3.4rem); }
+  .role-pet-scene { height: 160px; margin-top: 0; }
+  .role-pet-circle { top: 24px; height: 112px; }
+  .role-sun { top: 8px; width: 140px; height: 140px; }
+  .role-location { margin-top: 14px; }
+  .role-options { padding: 30px 23px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .role-option, .role-arrow { transition: none; }
+}
