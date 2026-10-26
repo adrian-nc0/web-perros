@@ -50,7 +50,7 @@ async function cloudRequest(path: string, init: RequestInit = {}): Promise<Respo
 
 async function uploadPhoto(image: string): Promise<string> {
   if (!image.startsWith("data:image/")) return image;
-  const [metadata, encoded] = image.split(",");
+  const [metadata] = image.split(",");
   const mimeType = metadata.match(/data:(.*?);base64/)?.[1] || "image/jpeg";
   const extension = mimeType.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
   const blob = await (await fetch(image)).blob();
