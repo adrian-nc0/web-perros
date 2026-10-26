@@ -173,7 +173,7 @@ function AdminPage() {
               {filteredAnimals.map((animal) => <article className="admin-table-row" key={animal.id}><div className="admin-table-animal"><img src={animal.image} alt="" /><div><strong>{animal.name}</strong><small>{animal.location}</small></div></div><span><i className={animal.type === "Perro" ? "species-dot dog" : "species-dot cat"} />{animal.type}</span><span>{animal.age}</span><span>{animal.size}</span><div className="admin-row-actions"><button onClick={() => openEditForm(animal)} aria-label={`Editar a ${animal.name}`} title="Editar">✎</button><button className="delete" onClick={() => handleDelete(animal)} aria-label={`Eliminar a ${animal.name}`} title="Eliminar">⌫</button></div></article>)}
               {filteredAnimals.length === 0 && <p className="admin-empty">No se encontraron mascotas. Prueba otra búsqueda o registra una nueva.</p>}
             </div>
-            <p className="admin-demo-note">Los cambios se guardan en el almacenamiento local de este navegador y se reflejan en la página de adopción abierta en este mismo dispositivo.</p>
+            <p className="admin-demo-note">Los cambios se guardan en este navegador y aparecerán en la página de adopción al volver a cargarla en este mismo navegador.</p>
           </div>
         )}
 
