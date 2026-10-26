@@ -7,33 +7,62 @@ function RoleSelectionPage() {
     <main className="role-page">
       <section className="role-shell">
         <div className="role-brand">
-          <span className="role-brand-mark" aria-hidden="true">🐾</span>
-          <p className="role-eyebrow">HUELLAS A CASA · SUCRE, BOLIVIA</p>
-          <h1>Una nueva historia puede comenzar contigo.</h1>
-          <p>Elige cómo quieres ingresar a nuestra comunidad de adopción responsable.</p>
+          <div className="role-topline">
+            <span className="role-brand-mark" aria-hidden="true">🐾</span>
+            <span className="role-brand-name">Huellas <b>a Casa</b></span>
+          </div>
+
+          <p className="role-eyebrow">ADOPCIÓN RESPONSABLE · SUCRE, BOLIVIA</p>
+          <h1>Un hogar cambia <em>toda una vida.</em></h1>
+          <p className="role-brand-copy">
+            Hay una amistad esperando por ti. Encuentra a tu nuevo compañero
+            y dale la oportunidad de formar parte de tu familia.
+          </p>
+
+          <div className="role-pet-scene" aria-label="Ilustración decorativa de mascotas">
+            <div className="role-sun" />
+            <span className="role-floating-paw paw-one">🐾</span>
+            <span className="role-floating-paw paw-two">✦</span>
+            <div className="role-pet-circle">
+              <span className="role-pet-dog">🐶</span>
+              <span className="role-pet-cat">🐱</span>
+            </div>
+            <div className="role-pet-caption">
+              <span>♡</span>
+              <p><strong>Amor que se adopta</strong><small>Una segunda oportunidad empieza aquí</small></p>
+            </div>
+          </div>
+
+          <div className="role-location"><span>⌖</span> Hecho con cariño en Sucre, Bolivia</div>
         </div>
 
         <div className="role-options">
-          <p className="role-question">¿Cómo deseas continuar?</p>
+          <span className="role-step">BIENVENIDO/A A HUELLAS A CASA</span>
+          <h2>¿Cómo deseas ingresar?</h2>
+          <p className="role-subtitle">Selecciona tu perfil para continuar.</p>
+
           <button className="role-option role-adopter" type="button" onClick={() => navigate("/adoptar")}>
             <span className="role-icon" aria-hidden="true">♡</span>
             <span className="role-option-copy">
-              <strong>Soy adoptante</strong>
-              <small>Conocer perros y gatos que buscan un hogar.</small>
+              <strong>Quiero adoptar</strong>
+              <small>Explorar perros y gatos que buscan una familia.</small>
+              <span className="role-option-tag">PARA FUTUROS ADOPTANTES</span>
             </span>
-            <span className="role-arrow" aria-hidden="true">→</span>
+            <span className="role-arrow" aria-hidden="true">↗</span>
           </button>
 
           <button className="role-option role-admin" type="button" onClick={() => navigate("/login")}>
-            <span className="role-icon" aria-hidden="true">⚙</span>
+            <span className="role-icon" aria-hidden="true">⌘</span>
             <span className="role-option-copy">
-              <strong>Soy administrador</strong>
-              <small>Ingresar con correo electrónico y contraseña.</small>
+              <strong>Acceso administrador</strong>
+              <small>Gestionar el sitio mediante correo y contraseña.</small>
+              <span className="role-option-tag">ÁREA PRIVADA</span>
             </span>
-            <span className="role-arrow" aria-hidden="true">→</span>
+            <span className="role-arrow" aria-hidden="true">↗</span>
           </button>
 
-          <p className="role-note">Promovemos adopciones responsables para perros y gatos en Sucre.</p>
+          <div className="role-trust-note"><span>✓</span><p><strong>Adoptar es un compromiso.</strong><br />Te acompañamos para dar este paso de forma responsable.</p></div>
+          <p className="role-note">Al continuar, ayudas a construir una comunidad que cuida y respeta a los animales.</p>
         </div>
       </section>
     </main>
