@@ -78,10 +78,25 @@ function AdminPage() {
     }
     const reader = new FileReader();
     reader.onload = () => {
-      if (typeof reader.result === "string") {
-        setForm((previous) => ({ ...previous, image: reader.result as string }));
+      if (typeof reader.result !== "string") return;
+      const photo = new Image();
+      photo.onload = () => {
+        const maxDimension = 1000;
+        const scale = Math.min(1, maxDimension / Math.max(photo.width, photo.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(photo.width * scale));
+        canvas.height = Math.max(1, Math.round(photo.height * scale));
+        const context = canvas.getContext("2d");
+        if (!context) {
+          setNotice("No se pudo procesar la foto. Intenta con otro archivo.");
+          return;
+        }
+        context.drawImage(photo, 0, 0, canvas.width, canvas.height);
+        setForm((previous) => ({ ...previous, image: canvas.toDataURL("image/jpeg", 0.78) }));
         setNotice("");
-      }
+      };
+      photo.onerror = () => setNotice("No se pudo abrir la imagen. Intenta con otra foto.");
+      photo.src = reader.result;
     };
     reader.onerror = () => setNotice("No se pudo leer la foto. Intenta con otro archivo.");
     reader.readAsDataURL(file);
