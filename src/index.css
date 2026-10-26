@@ -1074,3 +1074,18 @@ footer { display: flex; padding: 28px clamp(24px, 7vw, 112px); align-items: cent
 
 /* Ocultar la ilustración del perro y el gato en la selección de perfil */
 .role-pet-scene { display: none !important; }
+
+/* Fondo con fotografías para la pantalla de selección de perfil.
+   Esta regla va al final para que no la sobrescriba el fondo anterior. */
+.role-page {
+  background-color: #f7f0e3;
+  background-image:
+    linear-gradient(rgba(255, 250, 240, 0.48), rgba(255, 250, 240, 0.48)),
+    url("https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=80"),
+    url("https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=80"),
+    url("https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=80"),
+    url("https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=80");
+  background-size: cover, 50% 50%, 50% 50%, 50% 50%, 50% 50%;
+  background-position: center, left top, right top, left bottom, right bottom;
+  background-repeat: no-repeat;
+}
