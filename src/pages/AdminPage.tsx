@@ -16,6 +16,7 @@ const emptyForm: AnimalFormData = {
   image: "",
   story: "",
   tags: [],
+  healthCare: [],
 };
 
 function AdminPage() {
@@ -75,6 +76,7 @@ function AdminPage() {
       image: animal.image,
       story: animal.story,
       tags: animal.tags,
+      healthCare: animal.healthCare ?? [],
     });
     setFormOpen(true);
     setNotice("");
@@ -235,6 +237,7 @@ function AdminPage() {
                   {form.image && <button type="button" className="admin-remove-photo" onClick={() => setForm({ ...form, image: "" })}>Quitar fotografía</button>}
                 </div>
                 <label className="wide">Historia o descripción<textarea required minLength={10} rows={3} value={form.story} onChange={(event) => setForm({ ...form, story: event.target.value })} placeholder="Describe su personalidad y lo que necesita..." /></label>
+                <fieldset className="wide admin-health-field"><legend>Salud y cuidados registrados</legend><p>Marca solo los cuidados que estén confirmados en la cartilla o por el veterinario.</p>{["Vacunación registrada", "Desparasitación registrada", "Esterilización registrada", "Control veterinario realizado"].map((care) => <label key={care}><input type="checkbox" checked={(form.healthCare ?? []).includes(care)} onChange={(event) => setForm((previous) => ({ ...previous, healthCare: event.target.checked ? [...(previous.healthCare ?? []), care] : (previous.healthCare ?? []).filter((item) => item !== care) }))} />{care}</label>)}</fieldset>
                 <label className="wide">Características (separadas por coma)<input value={Array.isArray(form.tags) ? form.tags.join(", ") : form.tags} onChange={(event) => setForm({ ...form, tags: event.target.value.split(",").map((tag) => tag.trim()).filter(Boolean) })} placeholder="Cariñoso, Juguetón" /></label>
               </div>
               <div className="admin-form-actions"><button type="button" className="admin-cancel-button" onClick={() => setFormOpen(false)}>Cancelar</button><button type="submit" className="admin-primary-button">{editingId !== null ? "Guardar cambios" : "Registrar mascota"}</button></div>
