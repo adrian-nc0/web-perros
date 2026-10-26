@@ -858,3 +858,20 @@ footer { display: flex; padding: 28px clamp(24px, 7vw, 112px); align-items: cent
   .admin-photo-placeholder { width: 48px; height: 48px; flex-basis: 48px; }
   .admin-photo-instructions small { line-height: 1.4; }
 }
+
+
+/* Ficha individual de cada mascota */
+.animal-card { cursor: pointer; }
+.animal-card:focus-visible { outline: 3px solid #6e9b67; outline-offset: 4px; }
+.animal-detail-modal { max-width: 850px; }
+.animal-detail-content { padding: 30px; }
+.animal-detail-content h2 { margin: 0 0 10px; color: #294c3c; font-family: Georgia, serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 500; }
+.animal-detail-content > p:not(.section-kicker) { color: #69766c; line-height: 1.7; }
+.animal-detail-content .animal-detail-type { margin: 0; color: #3f694c; font-weight: 800; }
+.animal-detail-content .animal-detail-location { margin: 7px 0 18px; font-size: .85rem; }
+.animal-detail-content .tag-row { margin: 20px 0 24px; }
+.detail-back-button { display: block; margin-top: 14px; padding: 8px 0; border: 0; color: #55775e; background: transparent; font-weight: 800; }
+@media (max-width: 650px) {
+  .animal-detail-modal { width: min(94vw, 480px); max-height: 90vh; overflow-y: auto; }
+  .animal-detail-content { padding: 22px; }
+}
