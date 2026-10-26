@@ -1,6 +1,8 @@
 import type { Animal, AnimalFormData } from "../types/animal";
 
 const STORAGE_KEY = "huellas_animals";
+const TABLE = "animals";
+const BUCKET = "animal-photos";
 
 const initialAnimals: Animal[] = [
   { id: 1, name: "Milo", type: "Perro", age: "2 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=900&q=85", story: "Curioso, cariñoso y siempre listo para una aventura.", tags: ["Sociable", "Energético"] },
@@ -11,37 +13,119 @@ const initialAnimals: Animal[] = [
   { id: 6, name: "Simba", type: "Gato", age: "2 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=85", story: "Observador y afectuoso cuando gana confianza.", tags: ["Curioso", "Interior"] },
 ];
 
-export const animalRepository = {
-  getAll(): Animal[] {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as Animal[];
-        if (Array.isArray(parsed)) return parsed;
-      }
-    } catch {
-      // Si el almacenamiento no está disponible, usamos los datos iniciales.
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+export const isCloudCatalogEnabled = Boolean(supabaseUrl && supabaseKey);
+
+type AnimalRow = {
+  id: number;
+  name: string;
+  type: Animal["type"];
+  age: string;
+  size: string;
+  location: string;
+  image: string;
+  story: string;
+  tags: string[];
+};
+
+function toAnimal(row: AnimalRow): Animal {
+  return { ...row, id: Number(row.id), tags: Array.isArray(row.tags) ? row.tags : [] };
+}
+
+function headers(extra: Record<string, string> = {}): Record<string, string> {
+  if (!supabaseKey) throw new Error("Falta configurar VITE_SUPABASE_ANON_KEY.");
+  return { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, ...extra };
+}
+
+async function cloudRequest(path: string, init: RequestInit = {}): Promise<Response> {
+  if (!supabaseUrl || !supabaseKey) throw new Error("Falta configurar Supabase. Revisa el archivo .env.local y la guía de configuración.");
+  const response = await fetch(`${supabaseUrl}${path}`, { ...init, headers: headers({ ...(init.headers as Record<string, string> | undefined) }) });
+  if (!response.ok) {
+    const details = await response.text();
+    throw new Error(`Supabase respondió ${response.status}: ${details || response.statusText}`);
+  }
+  return response;
+}
+
+async function uploadPhoto(image: string): Promise<string> {
+  if (!image.startsWith("data:image/")) return image;
+  const [metadata, encoded] = image.split(",");
+  const mimeType = metadata.match(/data:(.*?);base64/)?.[1] || "image/jpeg";
+  const extension = mimeType.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
+  const blob = await (await fetch(image)).blob();
+  const fileName = `${crypto.randomUUID()}.${extension}`;
+  await cloudRequest(`/storage/v1/object/${BUCKET}/${fileName}`, {
+    method: "POST",
+    headers: { "Content-Type": mimeType, "x-upsert": "true" },
+    body: blob,
+  });
+  return `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${fileName}`;
+}
+
+function readLocal(): Animal[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved) as Animal[];
+      if (Array.isArray(parsed)) return parsed;
     }
-    return initialAnimals;
+  } catch {
+    // El almacenamiento local puede estar bloqueado por el navegador.
+  }
+  return initialAnimals;
+}
+
+function saveLocal(animals: Animal[]): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(animals));
+}
+
+export const animalRepository = {
+  async getAll(): Promise<Animal[]> {
+    if (!isCloudCatalogEnabled) return readLocal();
+    const response = await cloudRequest(`/rest/v1/${TABLE}?select=*&order=id.asc`);
+    const rows = await response.json() as AnimalRow[];
+    return rows.map(toAnimal);
   },
 
-  saveAll(animals: Animal[]): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(animals));
+  async create(data: AnimalFormData): Promise<Animal> {
+    if (!isCloudCatalogEnabled) {
+      const animals = readLocal();
+      const id = animals.reduce((max, animal) => Math.max(max, animal.id), 0) + 1;
+      const newAnimal: Animal = { ...data, id };
+      saveLocal([...animals, newAnimal]);
+      return newAnimal;
+    }
+    const row = { ...data, image: await uploadPhoto(data.image) };
+    const response = await cloudRequest(`/rest/v1/${TABLE}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Prefer: "return=representation" },
+      body: JSON.stringify(row),
+    });
+    const rows = await response.json() as AnimalRow[];
+    if (!rows[0]) throw new Error("La mascota se guardó, pero Supabase no devolvió su registro.");
+    return toAnimal(rows[0]);
   },
 
-  create(data: AnimalFormData): Animal {
-    const animals = this.getAll();
-    const nextId = animals.reduce((max, animal) => Math.max(max, animal.id), 0) + 1;
-    const newAnimal: Animal = { ...data, id: nextId };
-    this.saveAll([...animals, newAnimal]);
-    return newAnimal;
+  async update(updatedAnimal: Animal): Promise<void> {
+    if (!isCloudCatalogEnabled) {
+      saveLocal(readLocal().map((animal) => animal.id === updatedAnimal.id ? updatedAnimal : animal));
+      return;
+    }
+    const { id, ...data } = updatedAnimal;
+    const row = { ...data, image: await uploadPhoto(data.image) };
+    await cloudRequest(`/rest/v1/${TABLE}?id=eq.${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify(row),
+    });
   },
 
-  update(updatedAnimal: Animal): void {
-    this.saveAll(this.getAll().map((animal) => animal.id === updatedAnimal.id ? updatedAnimal : animal));
-  },
-
-  remove(id: number): void {
-    this.saveAll(this.getAll().filter((animal) => animal.id !== id));
+  async remove(id: number): Promise<void> {
+    if (!isCloudCatalogEnabled) {
+      saveLocal(readLocal().filter((animal) => animal.id !== id));
+      return;
+    }
+    await cloudRequest(`/rest/v1/${TABLE}?id=eq.${id}`, { method: "DELETE", headers: { Prefer: "return=minimal" } });
   },
 };
