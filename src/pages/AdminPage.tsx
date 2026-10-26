@@ -74,7 +74,7 @@ function AdminPage() {
       location: form.location.trim(),
       image: form.image.trim(),
       story: form.story.trim(),
-      tags: typeof form.tags === "string" ? form.tags.split(",").map((tag) => tag.trim()).filter(Boolean) : form.tags,
+      tags: Array.isArray(form.tags) ? form.tags : [],
     };
 
     if (editingId !== null) {
