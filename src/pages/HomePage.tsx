@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authRepository } from "../repositories/authRepository";
-
-type Animal = { id: number; name: string; type: "Perro" | "Gato"; age: string; size: string; location: string; image: string; story: string; tags: string[] };
+import { animalRepository } from "../repositories/animalRepository";
+import type { Animal } from "../types/animal";
 
 const WHATSAPP_NUMBER = "59157956302";
 
@@ -16,18 +16,10 @@ Me gustaría recibir más información sobre su proceso de adopción. Gracias.`;
   window.open(url, "_blank", "noopener,noreferrer");
 };
 
-const animals: Animal[] = [
-  { id: 1, name: "Milo", type: "Perro", age: "2 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=900&q=85", story: "Curioso, cariñoso y siempre listo para una aventura.", tags: ["Sociable", "Energético"] },
-  { id: 2, name: "Luna", type: "Gato", age: "1 año", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=85", story: "Una compañera tranquila que adora las siestas al sol.", tags: ["Tranquila", "Hogar"] },
-  { id: 3, name: "Bruno", type: "Perro", age: "4 años", size: "Grande", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=900&q=85", story: "Noble y leal; busca una familia con mucho amor.", tags: ["Cariñoso", "Paseos"] },
-  { id: 4, name: "Nala", type: "Gato", age: "3 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=900&q=85", story: "Dulce e independiente, con un ronroneo inolvidable.", tags: ["Mimos", "Adaptable"] },
-  { id: 5, name: "Toby", type: "Perro", age: "8 meses", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85", story: "Un pequeño explorador que llenará tu casa de alegría.", tags: ["Cachorro", "Juguetón"] },
-  { id: 6, name: "Simba", type: "Gato", age: "2 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=85", story: "Observador y afectuoso cuando gana confianza.", tags: ["Curioso", "Interior"] },
-];
-
 function HomePage() {
   const navigate = useNavigate();
   const user = authRepository.getCurrentUser();
+  const [animals] = useState<Animal[]>(() => animalRepository.getAll());
   const [filter, setFilter] = useState<"Todos" | Animal["type"]>("Todos");
   const [search, setSearch] = useState("");
   const [favorites, setFavorites] = useState<number[]>([]);
