@@ -1230,3 +1230,49 @@ footer { display: flex; padding: 28px clamp(24px, 7vw, 112px); align-items: cent
   .animal-card, .animal-photo img { transition: none; }
   .animal-card:hover, .animal-card:hover .animal-photo img { transform: none; }
 }
+
+
+/* Solicitud pública para registrar animales encontrados o rescatados */
+.request-animal-button {
+  display: inline-flex;
+  gap: 12px;
+  padding: 13px 18px;
+  align-items: center;
+  border: 1px solid #d7e3d3;
+  border-radius: 11px;
+  color: #315e4b;
+  background: #fffdf8;
+  box-shadow: 0 5px 16px rgba(41, 68, 47, .08);
+  font-size: .9rem;
+  font-weight: 800;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.request-animal-button:hover { transform: translateY(-2px); box-shadow: 0 9px 22px rgba(41, 68, 47, .13); }
+.request-animal-button span { color: #d76f55; font-size: 1.2rem; }
+.request-animal-button:focus-visible { outline: 3px solid #6e9b67; outline-offset: 3px; }
+.request-modal-backdrop { z-index: 120; overflow-y: auto; padding: 22px 14px; align-items: flex-start; }
+.animal-request-modal { position: relative; display: block; width: min(100%, 760px); max-height: none; overflow: visible; }
+.animal-request-content { padding: clamp(24px, 5vw, 42px); }
+.animal-request-content > h2 { margin: 0; color: #294c3c; font-family: Georgia, serif; font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.1; }
+.animal-request-content > p:not(.section-kicker) { color: #6d796e; line-height: 1.6; }
+.animal-request-form { display: grid; gap: 14px; margin-top: 24px; }
+.animal-request-form h3 { margin: 14px 0 0; color: #315e4b; font-size: 1.03rem; }
+.animal-request-form label { display: grid; gap: 7px; color: #405a49; font-size: .86rem; font-weight: 800; }
+.animal-request-form input, .animal-request-form select, .animal-request-form textarea {
+  width: 100%; min-width: 0; padding: 12px 13px; border: 1px solid #dce4d8; border-radius: 9px;
+  color: #2d4031; background: #fff; font: inherit; font-size: .9rem; font-weight: 400;
+}
+.animal-request-form textarea { resize: vertical; }
+.animal-request-form input:focus, .animal-request-form select:focus, .animal-request-form textarea:focus { outline: 3px solid rgba(91,139,91,.2); border-color: #6e9b67; }
+.animal-request-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.request-help { margin: 0; color: #778278; font-size: .82rem; line-height: 1.5; }
+.animal-request-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+.animal-request-actions .primary-button { cursor: pointer; }
+@media (max-width: 520px) {
+  .hero-people { align-items: flex-start; }
+  .request-animal-button { width: 100%; justify-content: space-between; font-size: .82rem; }
+  .animal-request-grid { grid-template-columns: minmax(0, 1fr); }
+  .animal-request-content { padding: 24px 18px; }
+  .animal-request-actions { flex-direction: column-reverse; }
+  .animal-request-actions button { width: 100%; justify-content: center; }
+}
