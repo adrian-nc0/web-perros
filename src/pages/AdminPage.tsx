@@ -30,6 +30,7 @@ function AdminPage() {
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [catalogError, setCatalogError] = useState("");
   const [search, setSearch] = useState("");
+  const [speciesFilter, setSpeciesFilter] = useState<"Todas" | AnimalType>("Todas");
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<AnimalFormData>(emptyForm);
@@ -39,8 +40,8 @@ function AdminPage() {
   const dogs = animals.filter((animal) => animal.type === "Perro").length;
   const cats = animals.filter((animal) => animal.type === "Gato").length;
   const filteredAnimals = useMemo(
-    () => animals.filter((animal) => `${animal.name} ${animal.type}`.toLowerCase().includes(search.toLowerCase())),
-    [animals, search],
+    () => animals.filter((animal) => `${animal.name} ${animal.type} ${animal.breed ?? ""} ${animal.location}`.toLowerCase().includes(search.toLowerCase()) && (speciesFilter === "Todas" || animal.type === speciesFilter)),
+    [animals, search, speciesFilter],
   );
 
   const refreshAnimals = async () => {
@@ -178,7 +179,7 @@ function AdminPage() {
           <button className={section === "mascotas" ? "active" : ""} onClick={() => { setSection("mascotas"); setFormOpen(false); }}><span>🐾</span> Mascotas <small>{animals.length}</small></button>
         </nav>
         <div className="admin-sidebar-bottom">
-          <div className="admin-user-avatar">A</div>
+          <div className="admin-user-avatar">{user.name.trim().charAt(0).toUpperCase() || "A"}</div>
           <div className="admin-user-info"><strong>{user.name}</strong><small>Administrador</small></div>
           <button className="admin-logout-icon" onClick={handleLogout} aria-label="Cerrar sesión" title="Cerrar sesión">↪</button>
         </div>
@@ -206,6 +207,7 @@ function AdminPage() {
               <article className="admin-stat-card"><span className="admin-stat-icon yellow">🐱</span><div><p>Gatos</p><strong>{cats}</strong><small>En búsqueda de una familia</small></div></article>
             </div>
             <div className="admin-section-heading admin-recent-heading"><div><h2>Últimas mascotas</h2><p>Perfiles disponibles en el catálogo.</p></div><button className="admin-text-button" onClick={() => setSection("mascotas")}>Ver todas →</button></div>
+            <div className="admin-quick-actions"><article><span>🐾</span><div><strong>Gestiona el catálogo</strong><p>Actualiza fotos, historias y cuidados para que cada perfil esté completo.</p><button onClick={() => setSection("mascotas")}>Abrir catálogo →</button></div></article><article><span>📷</span><div><strong>Consejo para las fotos</strong><p>Usa imágenes claras y recientes. Una buena foto ayuda a presentar mejor a cada mascota.</p></div></article><article><span>🩺</span><div><strong>Información responsable</strong><p>Marca los cuidados de salud únicamente cuando estén confirmados.</p></div></article></div>
             <div className="admin-recent-list">
               {animals.slice(-4).reverse().map((animal) => <article key={animal.id} className="admin-recent-item"><img src={animal.image} alt={animal.name} /><div><strong>{animal.name}</strong><small>{animal.type} · {animal.breed ?? "Mestizo/a"} · {animal.age}</small></div><span className="admin-status-pill">En catálogo</span><button onClick={() => { setSection("mascotas"); openEditForm(animal); }} aria-label={`Editar a ${animal.name}`}>✎</button></article>)}
               {animals.length === 0 && <p className="admin-empty">Todavía no hay mascotas registradas.</p>}
@@ -217,7 +219,7 @@ function AdminPage() {
         {section === "mascotas" && (
           <div className="admin-content">
             <div className="admin-section-heading admin-list-heading"><div><h2>Catálogo de mascotas</h2><p>Registra y actualiza los perfiles que se muestran a los adoptantes.</p></div><button className="admin-primary-button" onClick={openNewForm}>＋ Nueva mascota</button></div>
-            <div className="admin-table-tools"><label><span aria-hidden="true">⌕</span><input aria-label="Buscar mascotas por nombre o especie" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por nombre o especie..." /></label><span>{filteredAnimals.length} resultados</span></div>
+            <div className="admin-table-tools"><label><span aria-hidden="true">⌕</span><input aria-label="Buscar por nombre, especie, raza o ubicación" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por nombre, raza o ubicación..." /></label><div className="admin-catalog-tools"><div className="admin-filter-group" aria-label="Filtrar por especie">{(["Todas", "Perro", "Gato"] as const).map((filter) => <button type="button" key={filter} className={speciesFilter === filter ? "active" : ""} onClick={() => setSpeciesFilter(filter)}>{filter === "Todas" ? "Todas" : filter === "Perro" ? "🐶 Perros" : "🐱 Gatos"}</button>)}</div><button type="button" className="admin-refresh-button" onClick={() => void refreshAnimals()}>↻ Actualizar</button></div><span>{filteredAnimals.length} de {animals.length} mascotas</span></div>
 
             {formOpen && <form className="admin-animal-form" onSubmit={handleSubmit}>
               <div className="admin-form-heading"><div><p>{editingId !== null ? "ACTUALIZAR PERFIL" : "NUEVO PERFIL"}</p><h3>{editingId !== null ? "Editar mascota" : "Registrar una mascota"}</h3></div><button type="button" onClick={() => setFormOpen(false)} aria-label="Cerrar formulario">×</button></div>
@@ -253,7 +255,7 @@ function AdminPage() {
               {filteredAnimals.map((animal) => <article className="admin-table-row" key={animal.id}><div className="admin-table-animal"><img src={animal.image} alt={`Foto de ${animal.name}`} loading="lazy" decoding="async" /><div><strong>{animal.name}</strong><small>{animal.breed ?? "Mestizo/a"} · {animal.location}</small></div></div><span data-label="Especie"><i className={animal.type === "Perro" ? "species-dot dog" : "species-dot cat"} />{animal.type}</span><span data-label="Edad">{animal.age}</span><span data-label="Tamaño">{animal.size}</span><div className="admin-row-actions" data-label="Acciones"><button onClick={() => openEditForm(animal)} aria-label={`Editar a ${animal.name}`} title="Editar">✎</button><button className="delete" onClick={() => handleDelete(animal)} aria-label={`Eliminar a ${animal.name}`} title="Eliminar">⌫</button></div></article>)}
               {filteredAnimals.length === 0 && <p className="admin-empty">No se encontraron mascotas. Prueba otra búsqueda o registra una nueva.</p>}
             </div>
-            <p className="admin-demo-note">{isCloudCatalogEnabled ? "El catálogo está configurado para usar Supabase. Comprueba que la conexión y los permisos estén activos para compartir cambios entre dispositivos." : "Modo local: los cambios se guardan en este navegador y no se sincronizan con otros dispositivos. Para compartir el catálogo, configura Supabase."}</p>
+            <p className="admin-demo-note">{isCloudCatalogEnabled ? "El catálogo está conectado a un servicio compartido. Comprueba la conexión si los cambios tardan en aparecer." : "Modo de demostración: los cambios se guardan en este navegador y no se sincronizan entre dispositivos. Es ideal para probar el panel antes de incorporar almacenamiento compartido."}</p>
           </div>
         )}
 
