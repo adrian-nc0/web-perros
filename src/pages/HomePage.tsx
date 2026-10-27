@@ -8,7 +8,7 @@ import type { Animal } from "../types/animal";
 const WHATSAPP_NUMBER = "59157956302";
 
 const handleWhatsApp = (animal: Animal, message: string) => {
-  const text = `Hola, estoy interesado/a en adoptar a ${animal.name}, ${animal.type.toLowerCase()} de ${animal.location}.
+  const text = `Hola, estoy interesado/a en adoptar a ${animal.name}, ${animal.type.toLowerCase()} de raza ${animal.breed ?? "Mestizo/a"}, en ${animal.location}.
 
 ${message}
 
