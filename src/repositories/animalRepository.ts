@@ -21,6 +21,7 @@ type AnimalRow = {
   id: number;
   name: string;
   type: Animal["type"];
+  breed?: string;
   age: string;
   size: string;
   location: string;
@@ -31,7 +32,7 @@ type AnimalRow = {
 };
 
 function toAnimal(row: AnimalRow): Animal {
-  return { ...row, id: Number(row.id), tags: Array.isArray(row.tags) ? row.tags : [], healthCare: Array.isArray(row.health_care) ? row.health_care : [] };
+  return { ...row, breed: row.breed || "Mestizo/a", id: Number(row.id), tags: Array.isArray(row.tags) ? row.tags : [], healthCare: Array.isArray(row.health_care) ? row.health_care : [] };
 }
 
 function headers(extra: Record<string, string> = {}): Record<string, string> {
@@ -71,7 +72,7 @@ function readLocal(): Animal[] {
       const parsed = JSON.parse(saved) as Animal[];
       if (Array.isArray(parsed)) return parsed.map((animal) => {
         const sample = initialAnimals.find((demo) => demo.id === animal.id && demo.name === animal.name && demo.image === animal.image);
-        return { ...animal, healthCare: animal.healthCare ?? sample?.healthCare ?? [] };
+        return { ...animal, breed: animal.breed || "Mestizo/a", healthCare: animal.healthCare ?? sample?.healthCare ?? [] };
       });
     }
   } catch {
