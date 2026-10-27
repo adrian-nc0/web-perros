@@ -7,9 +7,13 @@ import type { Animal, AnimalFormData, AnimalType } from "../types/animal";
 
 type AdminSection = "resumen" | "mascotas";
 
+const dogBreeds = ["Mestizo/a", "Labrador Retriever", "Pastor Alemán", "Golden Retriever", "Caniche / Poodle", "Bulldog", "Beagle", "Chihuahua", "Husky Siberiano", "Rottweiler", "Boxer", "Dálmata", "Shih Tzu", "Dachshund / Salchicha", "Pitbull", "Border Collie", "Cocker Spaniel", "Otro / No identificado"];
+const catBreeds = ["Mestizo/a", "Doméstico de pelo corto", "Doméstico de pelo largo", "Siamés", "Persa", "Maine Coon", "Bengalí", "Angora", "Ragdoll", "British Shorthair", "Esfinge", "Azul Ruso", "Otro / No identificado"];
+
 const emptyForm: AnimalFormData = {
   name: "",
   type: "Perro",
+  breed: "Mestizo/a",
   age: "",
   size: "Mediano",
   location: "Sucre, Bolivia",
@@ -70,6 +74,7 @@ function AdminPage() {
     setForm({
       name: animal.name,
       type: animal.type,
+      breed: animal.breed ?? "Mestizo/a",
       age: animal.age,
       size: animal.size,
       location: animal.location,
@@ -202,7 +207,7 @@ function AdminPage() {
             </div>
             <div className="admin-section-heading admin-recent-heading"><div><h2>Últimas mascotas</h2><p>Perfiles disponibles en el catálogo.</p></div><button className="admin-text-button" onClick={() => setSection("mascotas")}>Ver todas →</button></div>
             <div className="admin-recent-list">
-              {animals.slice(-4).reverse().map((animal) => <article key={animal.id} className="admin-recent-item"><img src={animal.image} alt={animal.name} /><div><strong>{animal.name}</strong><small>{animal.type} · {animal.age}</small></div><span className="admin-status-pill">En catálogo</span><button onClick={() => { setSection("mascotas"); openEditForm(animal); }} aria-label={`Editar a ${animal.name}`}>✎</button></article>)}
+              {animals.slice(-4).reverse().map((animal) => <article key={animal.id} className="admin-recent-item"><img src={animal.image} alt={animal.name} /><div><strong>{animal.name}</strong><small>{animal.type} · {animal.breed ?? "Mestizo/a"} · {animal.age}</small></div><span className="admin-status-pill">En catálogo</span><button onClick={() => { setSection("mascotas"); openEditForm(animal); }} aria-label={`Editar a ${animal.name}`}>✎</button></article>)}
               {animals.length === 0 && <p className="admin-empty">Todavía no hay mascotas registradas.</p>}
             </div>
             <p className="admin-demo-note">Nota: los perfiles iniciales son datos de demostración. Reemplázalos por información real y autorizada antes de publicar el sistema.</p>
@@ -218,7 +223,8 @@ function AdminPage() {
               <div className="admin-form-heading"><div><p>{editingId !== null ? "ACTUALIZAR PERFIL" : "NUEVO PERFIL"}</p><h3>{editingId !== null ? "Editar mascota" : "Registrar una mascota"}</h3></div><button type="button" onClick={() => setFormOpen(false)} aria-label="Cerrar formulario">×</button></div>
               <div className="admin-form-grid">
                 <label>Nombre<input required maxLength={50} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Ej. Canela" /></label>
-                <label>Especie<select value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value as AnimalType })}><option>Perro</option><option>Gato</option></select></label>
+                <label>Especie<select value={form.type} onChange={(event) => { const type = event.target.value as AnimalType; setForm({ ...form, type, breed: type === "Perro" ? dogBreeds[0] : catBreeds[0] }); }}><option>Perro</option><option>Gato</option></select></label>
+                <label>Raza<select value={form.breed || "Mestizo/a"} onChange={(event) => setForm({ ...form, breed: event.target.value })}>{(form.type === "Perro" ? dogBreeds : catBreeds).map((breed) => <option key={breed} value={breed}>{breed}</option>)}</select></label>
                 <label>Edad aproximada<input required value={form.age} onChange={(event) => setForm({ ...form, age: event.target.value })} placeholder="Ej. 1 año" /></label>
                 <label>Tamaño<select value={form.size} onChange={(event) => setForm({ ...form, size: event.target.value })}><option>Pequeño</option><option>Mediano</option><option>Grande</option></select></label>
                 <div className="wide admin-photo-field">
@@ -244,7 +250,7 @@ function AdminPage() {
 
             <div className="admin-animal-table">
               <div className="admin-table-head"><span>MASCOTA</span><span>ESPECIE</span><span>EDAD</span><span>TAMAÑO</span><span>ACCIONES</span></div>
-              {filteredAnimals.map((animal) => <article className="admin-table-row" key={animal.id}><div className="admin-table-animal"><img src={animal.image} alt={`Foto de ${animal.name}`} loading="lazy" decoding="async" /><div><strong>{animal.name}</strong><small>{animal.location}</small></div></div><span data-label="Especie"><i className={animal.type === "Perro" ? "species-dot dog" : "species-dot cat"} />{animal.type}</span><span data-label="Edad">{animal.age}</span><span data-label="Tamaño">{animal.size}</span><div className="admin-row-actions" data-label="Acciones"><button onClick={() => openEditForm(animal)} aria-label={`Editar a ${animal.name}`} title="Editar">✎</button><button className="delete" onClick={() => handleDelete(animal)} aria-label={`Eliminar a ${animal.name}`} title="Eliminar">⌫</button></div></article>)}
+              {filteredAnimals.map((animal) => <article className="admin-table-row" key={animal.id}><div className="admin-table-animal"><img src={animal.image} alt={`Foto de ${animal.name}`} loading="lazy" decoding="async" /><div><strong>{animal.name}</strong><small>{animal.breed ?? "Mestizo/a"} · {animal.location}</small></div></div><span data-label="Especie"><i className={animal.type === "Perro" ? "species-dot dog" : "species-dot cat"} />{animal.type}</span><span data-label="Edad">{animal.age}</span><span data-label="Tamaño">{animal.size}</span><div className="admin-row-actions" data-label="Acciones"><button onClick={() => openEditForm(animal)} aria-label={`Editar a ${animal.name}`} title="Editar">✎</button><button className="delete" onClick={() => handleDelete(animal)} aria-label={`Eliminar a ${animal.name}`} title="Eliminar">⌫</button></div></article>)}
               {filteredAnimals.length === 0 && <p className="admin-empty">No se encontraron mascotas. Prueba otra búsqueda o registra una nueva.</p>}
             </div>
             <p className="admin-demo-note">{isCloudCatalogEnabled ? "El catálogo está configurado para usar Supabase. Comprueba que la conexión y los permisos estén activos para compartir cambios entre dispositivos." : "Modo local: los cambios se guardan en este navegador y no se sincronizan con otros dispositivos. Para compartir el catálogo, configura Supabase."}</p>
