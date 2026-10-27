@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { authRepository } from "../repositories/authRepository";
 import { animalRepository } from "../repositories/animalRepository";
@@ -49,7 +50,7 @@ function HomePage() {
     story: "", tags: "", vaccinated: "No sé", dewormed: "No sé",
     sterilized: "No sé", vetChecked: "No sé", extra: "",
   });
-  const submitAnimalRequest = (event: React.FormEvent<HTMLFormElement>) => {
+  const submitAnimalRequest = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const message = `Hola, quiero solicitar que publiquen una mascota en Huellas a Casa.
 
