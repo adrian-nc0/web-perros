@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { authRepository } from "../repositories/authRepository";
-import { animalRepository } from "../repositories/animalRepository";
+import { animalRepository, isCloudCatalogEnabled } from "../repositories/animalRepository";
 import type { Animal, AnimalFormData, AnimalType } from "../types/animal";
 
-type AdminSection = "resumen" | "mascotas" | "solicitudes";
+type AdminSection = "resumen" | "mascotas";
 
 const emptyForm: AnimalFormData = {
   name: "",
@@ -171,7 +171,6 @@ function AdminPage() {
         <nav className="admin-nav" aria-label="Menú de administración">
           <button className={section === "resumen" ? "active" : ""} onClick={() => { setSection("resumen"); setFormOpen(false); }}><span>▦</span> Resumen</button>
           <button className={section === "mascotas" ? "active" : ""} onClick={() => { setSection("mascotas"); setFormOpen(false); }}><span>🐾</span> Mascotas <small>{animals.length}</small></button>
-          <button className={section === "solicitudes" ? "active" : ""} onClick={() => { setSection("solicitudes"); setFormOpen(false); }}><span>♡</span> Solicitudes <small>—</small></button>
         </nav>
         <div className="admin-sidebar-bottom">
           <div className="admin-user-avatar">A</div>
@@ -182,7 +181,7 @@ function AdminPage() {
 
       <section className="admin-main">
         <header className="admin-topbar">
-          <div><p className="admin-breadcrumb">HUELLAS A CASA <span>/</span> ADMINISTRACIÓN</p><h1>{section === "resumen" ? "Panel de control" : section === "mascotas" ? "Gestión de mascotas" : "Solicitudes de adopción"}</h1></div>
+          <div><p className="admin-breadcrumb">HUELLAS A CASA <span>/</span> ADMINISTRACIÓN</p><h1>{section === "resumen" ? "Panel de control" : "Gestión de mascotas"}</h1></div>
           <div className="admin-topbar-right"><span className="admin-live-dot" /> <span>Sucre, Bolivia</span><button onClick={handleLogout}>Cerrar sesión ↗</button></div>
         </header>
 
@@ -213,7 +212,7 @@ function AdminPage() {
         {section === "mascotas" && (
           <div className="admin-content">
             <div className="admin-section-heading admin-list-heading"><div><h2>Catálogo de mascotas</h2><p>Registra y actualiza los perfiles que se muestran a los adoptantes.</p></div><button className="admin-primary-button" onClick={openNewForm}>＋ Nueva mascota</button></div>
-            <div className="admin-table-tools"><label><span>⌕</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por nombre o especie..." /></label><span>{filteredAnimals.length} resultados</span></div>
+            <div className="admin-table-tools"><label><span aria-hidden="true">⌕</span><input aria-label="Buscar mascotas por nombre o especie" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por nombre o especie..." /></label><span>{filteredAnimals.length} resultados</span></div>
 
             {formOpen && <form className="admin-animal-form" onSubmit={handleSubmit}>
               <div className="admin-form-heading"><div><p>{editingId !== null ? "ACTUALIZAR PERFIL" : "NUEVO PERFIL"}</p><h3>{editingId !== null ? "Editar mascota" : "Registrar una mascota"}</h3></div><button type="button" onClick={() => setFormOpen(false)} aria-label="Cerrar formulario">×</button></div>
@@ -245,19 +244,13 @@ function AdminPage() {
 
             <div className="admin-animal-table">
               <div className="admin-table-head"><span>MASCOTA</span><span>ESPECIE</span><span>EDAD</span><span>TAMAÑO</span><span>ACCIONES</span></div>
-              {filteredAnimals.map((animal) => <article className="admin-table-row" key={animal.id}><div className="admin-table-animal"><img src={animal.image} alt="" /><div><strong>{animal.name}</strong><small>{animal.location}</small></div></div><span><i className={animal.type === "Perro" ? "species-dot dog" : "species-dot cat"} />{animal.type}</span><span>{animal.age}</span><span>{animal.size}</span><div className="admin-row-actions"><button onClick={() => openEditForm(animal)} aria-label={`Editar a ${animal.name}`} title="Editar">✎</button><button className="delete" onClick={() => handleDelete(animal)} aria-label={`Eliminar a ${animal.name}`} title="Eliminar">⌫</button></div></article>)}
+              {filteredAnimals.map((animal) => <article className="admin-table-row" key={animal.id}><div className="admin-table-animal"><img src={animal.image} alt={`Foto de ${animal.name}`} loading="lazy" decoding="async" /><div><strong>{animal.name}</strong><small>{animal.location}</small></div></div><span data-label="Especie"><i className={animal.type === "Perro" ? "species-dot dog" : "species-dot cat"} />{animal.type}</span><span data-label="Edad">{animal.age}</span><span data-label="Tamaño">{animal.size}</span><div className="admin-row-actions" data-label="Acciones"><button onClick={() => openEditForm(animal)} aria-label={`Editar a ${animal.name}`} title="Editar">✎</button><button className="delete" onClick={() => handleDelete(animal)} aria-label={`Eliminar a ${animal.name}`} title="Eliminar">⌫</button></div></article>)}
               {filteredAnimals.length === 0 && <p className="admin-empty">No se encontraron mascotas. Prueba otra búsqueda o registra una nueva.</p>}
             </div>
-            <p className="admin-demo-note">Los cambios se guardan en la base de datos compartida y se reflejan en el catálogo de todos los dispositivos en unos segundos.</p>
+            <p className="admin-demo-note">{isCloudCatalogEnabled ? "El catálogo está configurado para usar Supabase. Comprueba que la conexión y los permisos estén activos para compartir cambios entre dispositivos." : "Modo local: los cambios se guardan en este navegador y no se sincronizan con otros dispositivos. Para compartir el catálogo, configura Supabase."}</p>
           </div>
         )}
 
-        {section === "solicitudes" && (
-          <div className="admin-content">
-            <div className="admin-section-heading"><div><h2>Solicitudes de adopción</h2><p>Seguimiento de las personas interesadas en adoptar.</p></div></div>
-            <div className="admin-requests-empty"><span>♡</span><h2>Aún no hay solicitudes registradas</h2><p>Actualmente, el formulario de adopción abre WhatsApp con un mensaje preparado. Por eso, las conversaciones no se guardan en este panel.</p><div><strong>Próxima mejora</strong><br />Conectar un formulario y una base de datos para registrar cada solicitud, consultar su estado y dar seguimiento desde aquí.</div></div>
-          </div>
-        )}
       </section>
     </main>
   );

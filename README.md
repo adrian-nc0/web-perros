@@ -1,32 +1,36 @@
-# React + TypeScript + Vite
+# Huellas a Casa
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Sitio web para presentar perros y gatos que buscan un hogar en Sucre, Bolivia. Proyecto desarrollado con React, TypeScript, React Router y Vite.
 
-Currently, two official plugins are available:
+## Ejecutar en desarrollo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Instala Node.js compatible con la versión de Vite del proyecto.
+2. Instala dependencias con `npm install`.
+3. Inicia el servidor con `npm run dev`.
+4. Antes de publicar, ejecuta `npm run build` y `npm run lint`.
 
-## React Compiler
+## Funciones actuales
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Catálogo de mascotas con búsqueda y filtros por especie.
+- Ficha de cada mascota con historia, características y cuidados veterinarios registrados.
+- Consulta por WhatsApp desde la ficha de cada animal.
+- Panel para registrar, editar y eliminar perfiles.
+- El formulario de imágenes valida el tipo de archivo y su tamaño, y genera una vista previa optimizada.
+- El panel distingue el modo local del catálogo configurado para Supabase.
 
-## Expanding the Oxlint configuration
+## Almacenamiento
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+Si no se configuran `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`, los perfiles se guardan en el almacenamiento local del navegador. Esos cambios no se comparten automáticamente entre dispositivos. Para un catálogo compartido, configura Supabase siguiendo `supabase/setup.sql` y verifica las políticas y el bucket de fotografías.
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+El panel de solicitudes todavía no guarda solicitudes: el flujo actual abre WhatsApp con un mensaje preparado. Para registrar y dar seguimiento a solicitudes será necesario implementar un formulario y una tabla específica.
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Comprobación antes de publicar
+
+- Probar catálogo, búsqueda, filtros, ficha y consulta por WhatsApp.
+- Probar el registro, edición y eliminación de perfiles.
+- Verificar imágenes y campos de salud con información real confirmada.
+- Probar la interfaz en móvil, tablet y escritorio.
+- Ejecutar `npm run build` y `npm run lint`.
+- Confirmar que las variables de entorno, políticas de base de datos y despliegue estén correctamente configurados.
+
+Los datos de ejemplo son demostrativos; reemplázalos por información real y autorizada antes de utilizar el sitio públicamente.
