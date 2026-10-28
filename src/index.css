@@ -753,7 +753,7 @@ footer { display: flex; padding: 28px clamp(24px, 7vw, 112px); align-items: cent
 .admin-table-tools input { width: 100%; border: 0; outline: 0; color: #365541; background: transparent; font-size: .75rem; }
 .admin-table-tools > span { color: #879487; font-size: .7rem; }
 .admin-animal-table { overflow: hidden; border: 1px solid #e7ede4; border-radius: 13px; background: #fffefa; }
-.admin-table-head, .admin-table-row { display: grid; grid-template-columns: minmax(170px, 1.6fr) minmax(80px, .8fr) minmax(70px, .65fr) minmax(70px, .7fr) 82px; gap: 12px; align-items: center; }
+.admin-table-head, .admin-table-row { display: grid; grid-template-columns: minmax(150px, 1.5fr) minmax(68px, .7fr) minmax(65px, .6fr) minmax(65px, .6fr) minmax(65px, .6fr) 82px; gap: 12px; align-items: center; }
 .admin-table-head { min-height: 43px; padding: 0 17px; border-bottom: 1px solid #e8eee5; color: #9aa69a; background: #fbfcf8; font-size: .57rem; font-weight: 900; letter-spacing: .08em; }
 .admin-table-row { min-height: 73px; padding: 10px 17px; border-bottom: 1px solid #f0f2ed; color: #708072; font-size: .72rem; }
 .admin-table-row:last-child { border-bottom: 0; }
