@@ -8,7 +8,7 @@ const initialAnimals: Animal[] = [
   { id: 1, name: "Milo", type: "Perro", breed: "Mestizo/a", age: "2 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=900&q=85", story: "Curioso, cariñoso y siempre listo para una aventura.", tags: ["Sociable", "Energético"], healthCare: ["Desparasitación registrada", "Control veterinario realizado"] },
   { id: 3, name: "Bruno", type: "Perro", breed: "Doberman en miniatura", age: "4 años", size: "Pequeño", location: "Sucre, Bolivia", image: "/images/download.jpg", story: "Noble y leal; ya realizó una consulta veterinaria y está desparasitado. Busca una familia con mucho amor.", tags: ["Cariñoso", "Paseos"], healthCare: ["Consulta veterinaria realizada", "Desparasitación realizada"] },
   { id: 4, name: "Nala", type: "Gato", breed: "Mestizo/a", age: "3 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=900&q=85", story: "Dulce e independiente, con un ronroneo inolvidable.", tags: ["Mimos", "Adaptable"], healthCare: ["Desparasitación registrada"] },
-  { id: 5, name: "Toby", type: "Perro", breed: "Labrador Retriever", age: "8 meses", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85", story: "Un pequeño explorador que llenará tu casa de alegría.", tags: ["Cachorro", "Juguetón"], healthCare: ["Vacunación registrada", "Desparasitación registrada"] },
+  { id: 5, name: "Toby", type: "Perro", breed: "Labrador Retriever", age: "1 año", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85", story: "Un pequeño explorador que llenará tu casa de alegría.", tags: ["Cachorro", "Juguetón"], healthCare: ["Vacunación registrada", "Desparasitación registrada"] },
   { id: 6, name: "Simba", type: "Gato", breed: "Siamés", age: "2 años", size: "Mediano", location: "Sucre, Bolivia", image: "/images/dc2516a5-3ea6-4948-b344-01bccdf5ae1e.jpg", story: "Observador y afectuoso cuando gana confianza.", tags: ["Curioso", "Interior"] },
   { id: 7, name: "Canela", type: "Perro", breed: "Mestiza", age: "1 año", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=85", story: "Amigable y juguetona; disfruta los paseos y conocer gente nueva.", tags: ["Juguetona", "Sociable"], healthCare: [] },
   { id: 8, name: "Pelusa", type: "Gato", breed: "Doméstico de pelo largo", age: "8 meses", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=900&q=85", story: "Una gatita curiosa que busca un hogar paciente y lleno de cariño.", tags: ["Curiosa", "Cariñosa"], healthCare: [] },
@@ -88,6 +88,13 @@ function readLocal(): Animal[] {
           normalized = normalized.filter((animal) => !(animal.id === 2 && animal.name === "Luna"));
           saveLocal(normalized);
           localStorage.setItem(lunaRemovalVersion, "true");
+        }
+        // Actualiza la edad y el tamaño de Toby en catálogos guardados previamente.
+        const tobyUpdateVersion = "huellas_update_toby_v1";
+        if (!localStorage.getItem(tobyUpdateVersion)) {
+          normalized = normalized.map((animal) => animal.id === 5 && animal.name === "Toby" ? { ...animal, age: "1 año", size: "Mediano" } : animal);
+          saveLocal(normalized);
+          localStorage.setItem(tobyUpdateVersion, "true");
         }
         // Agrega los nuevos ejemplos una sola vez en navegadores que ya tenían el catálogo guardado.
         const photoSeedVersion = "huellas_real_photos_v3";
