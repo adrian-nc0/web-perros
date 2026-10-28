@@ -15,8 +15,6 @@ const initialAnimals: Animal[] = [
   { id: 10, name: "Michi", type: "Gato", breed: "Persa", age: "2 años", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=900&q=85", story: "Le encanta explorar rincones cómodos y descansar cerca de sus personas favoritas.", tags: ["Independiente", "Hogar"], healthCare: [] },
   { id: 11, name: "Max", type: "Perro", breed: "Labrador mestizo", age: "5 años", size: "Grande", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=900&q=85", story: "Un compañero noble que disfruta la compañía y los paseos tranquilos.", tags: ["Noble", "Paseos"], healthCare: [] },
   { id: 12, name: "Mora", type: "Gato", breed: "Mestiza", age: "1 año", size: "Pequeño", location: "Sucre, Bolivia", image: "/images/7d58b216-c792-4e55-ae6f-463fd29bf375.jpg", story: "Dulce y observadora, está lista para descubrir un nuevo hogar a su ritmo.", tags: ["Dulce", "Curiosa"], healthCare: [] },
-  { id: 13, name: "Bobby", type: "Perro", breed: "Mestizo", age: "6 meses", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1503256207526-0d5d80fa2f97?auto=format&fit=crop&w=900&q=85", story: "Un cachorro lleno de energía que necesita compañía, juegos y aprendizaje.", tags: ["Cachorro", "Activo"], healthCare: [] },
-  { id: 14, name: "Nube", type: "Gato", breed: "Doméstico de pelo corto", age: "4 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?auto=format&fit=crop&w=900&q=85", story: "Serena y adaptable; sueña con una casa tranquila donde sentirse segura.", tags: ["Serena", "Adaptable"], healthCare: [] },
 ];
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
@@ -87,6 +85,13 @@ function readLocal(): Animal[] {
           normalized = normalized.filter((animal) => !(animal.id === 2 && animal.name === "Luna"));
           saveLocal(normalized);
           localStorage.setItem(lunaRemovalVersion, "true");
+        }
+        // Elimina a Bobby y Nube de catálogos guardados en navegadores con datos anteriores.
+        const bobbyNubeRemovalVersion = "huellas_remove_bobby_nube_v1";
+        if (!localStorage.getItem(bobbyNubeRemovalVersion)) {
+          normalized = normalized.filter((animal) => !((animal.id === 13 && animal.name === "Bobby") || (animal.id === 14 && animal.name === "Nube")));
+          saveLocal(normalized);
+          localStorage.setItem(bobbyNubeRemovalVersion, "true");
         }
         // Actualiza la raza de Michi en catálogos guardados previamente.
         const michiBreedVersion = "huellas_update_michi_breed_v1";
