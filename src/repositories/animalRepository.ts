@@ -93,6 +93,19 @@ function readLocal(): Animal[] {
           saveLocal(normalized);
           localStorage.setItem(bobbyNubeRemovalVersion, "true");
         }
+        // Fuerza los datos actualizados de Bruno en catálogos guardados previamente.
+        const brunoUpdateVersion = "huellas_update_bruno_v2";
+        if (!localStorage.getItem(brunoUpdateVersion)) {
+          normalized = normalized.map((animal) => animal.id === 3 && animal.name === "Bruno" ? {
+            ...animal,
+            breed: "Doberman en miniatura",
+            size: "Pequeño",
+            story: "Noble y leal; ya realizó una consulta veterinaria y está desparasitado. Busca una familia con mucho amor.",
+            healthCare: ["Consulta veterinaria realizada", "Desparasitación realizada"],
+          } : animal);
+          saveLocal(normalized);
+          localStorage.setItem(brunoUpdateVersion, "true");
+        }
         // Actualiza la raza de Michi en catálogos guardados previamente.
         const michiBreedVersion = "huellas_update_michi_breed_v1";
         if (!localStorage.getItem(michiBreedVersion)) {
