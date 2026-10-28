@@ -6,7 +6,6 @@ const BUCKET = "animal-photos";
 
 const initialAnimals: Animal[] = [
   { id: 1, name: "Milo", type: "Perro", breed: "Mestizo/a", age: "2 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=900&q=85", story: "Curioso, cariñoso y siempre listo para una aventura.", tags: ["Sociable", "Energético"], healthCare: ["Desparasitación registrada", "Control veterinario realizado"] },
-  { id: 2, name: "Luna", type: "Gato", breed: "Doméstico de pelo corto", age: "1 año", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=85", story: "Una compañera tranquila que adora las siestas al sol.", tags: ["Tranquila", "Hogar"], healthCare: ["Vacunación registrada"] },
   { id: 3, name: "Bruno", type: "Perro", breed: "Pastor Alemán", age: "4 años", size: "Grande", location: "Sucre, Bolivia", image: "/images/download.jpg", story: "Noble y leal; busca una familia con mucho amor.", tags: ["Cariñoso", "Paseos"] },
   { id: 4, name: "Nala", type: "Gato", breed: "Mestizo/a", age: "3 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=900&q=85", story: "Dulce e independiente, con un ronroneo inolvidable.", tags: ["Mimos", "Adaptable"], healthCare: ["Desparasitación registrada"] },
   { id: 5, name: "Toby", type: "Perro", breed: "Labrador Retriever", age: "8 meses", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85", story: "Un pequeño explorador que llenará tu casa de alegría.", tags: ["Cachorro", "Juguetón"], healthCare: ["Vacunación registrada", "Desparasitación registrada"] },
@@ -79,10 +78,17 @@ function readLocal(): Animal[] {
     if (saved) {
       const parsed = JSON.parse(saved) as Animal[];
       if (Array.isArray(parsed)) {
-        const normalized = parsed.map((animal) => {
+        let normalized = parsed.map((animal) => {
           const sample = initialAnimals.find((demo) => demo.id === animal.id && demo.name === animal.name && demo.image === animal.image);
           return { ...animal, breed: animal.breed || "Mestizo/a", healthCare: animal.healthCare ?? sample?.healthCare ?? [] };
         });
+        // Elimina a Luna del catálogo guardado en navegadores que ya tenían datos anteriores.
+        const lunaRemovalVersion = "huellas_remove_luna_v1";
+        if (!localStorage.getItem(lunaRemovalVersion)) {
+          normalized = normalized.filter((animal) => !(animal.id === 2 && animal.name === "Luna"));
+          saveLocal(normalized);
+          localStorage.setItem(lunaRemovalVersion, "true");
+        }
         // Agrega los nuevos ejemplos una sola vez en navegadores que ya tenían el catálogo guardado.
         const photoSeedVersion = "huellas_real_photos_v3";
         if (!localStorage.getItem(photoSeedVersion)) {
