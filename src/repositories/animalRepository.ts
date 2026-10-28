@@ -11,7 +11,7 @@ const initialAnimals: Animal[] = [
   { id: 5, name: "Toby", type: "Perro", breed: "Labrador Retriever", age: "1 año", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85", story: "Un pequeño explorador que llenará tu casa de alegría.", tags: ["Cachorro", "Juguetón"], healthCare: ["Vacunación registrada", "Desparasitación registrada"] },
   { id: 6, name: "Simba", type: "Gato", breed: "Siamés", age: "2 años", size: "Mediano", location: "Sucre, Bolivia", image: "/images/dc2516a5-3ea6-4948-b344-01bccdf5ae1e.jpg", story: "Observador y afectuoso cuando gana confianza.", tags: ["Curioso", "Interior"] },
   { id: 7, name: "Canela", type: "Perro", breed: "Mestiza", age: "1 año", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=85", story: "Amigable y juguetona; disfruta los paseos y conocer gente nueva.", tags: ["Juguetona", "Sociable"], healthCare: [] },
-  { id: 9, name: "Rocky", type: "Perro", breed: "Mestizo", age: "3 años", size: "Grande", location: "Sucre, Bolivia", image: "/images/7fb44a67-49bc-4c5c-b9d5-564ddebc9d22.jpg", story: "Tranquilo y atento, ideal para una familia que disfrute compartir tiempo al aire libre.", tags: ["Tranquilo", "Compañero"], healthCare: [] },
+  { id: 9, name: "Rocky", type: "Perro", breed: "Boxer", age: "2 meses", size: "Grande", location: "Sucre, Bolivia", image: "/images/7fb44a67-49bc-4c5c-b9d5-564ddebc9d22.jpg", story: "Tranquilo y atento, ideal para una familia que disfrute compartir tiempo al aire libre.", tags: ["Tranquilo", "Compañero"], healthCare: [] },
   { id: 10, name: "Michi", type: "Gato", breed: "Doméstico de pelo corto", age: "2 años", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=900&q=85", story: "Le encanta explorar rincones cómodos y descansar cerca de sus personas favoritas.", tags: ["Independiente", "Hogar"], healthCare: [] },
   { id: 11, name: "Max", type: "Perro", breed: "Labrador mestizo", age: "5 años", size: "Grande", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=900&q=85", story: "Un compañero noble que disfruta la compañía y los paseos tranquilos.", tags: ["Noble", "Paseos"], healthCare: [] },
   { id: 12, name: "Mora", type: "Gato", breed: "Mestiza", age: "1 año", size: "Pequeño", location: "Sucre, Bolivia", image: "/images/7d58b216-c792-4e55-ae6f-463fd29bf375.jpg", story: "Dulce y observadora, está lista para descubrir un nuevo hogar a su ritmo.", tags: ["Dulce", "Curiosa"], healthCare: [] },
@@ -87,6 +87,13 @@ function readLocal(): Animal[] {
           normalized = normalized.filter((animal) => !(animal.id === 2 && animal.name === "Luna"));
           saveLocal(normalized);
           localStorage.setItem(lunaRemovalVersion, "true");
+        }
+        // Actualiza raza y edad de Rocky en catálogos guardados previamente.
+        const rockyUpdateVersion = "huellas_update_rocky_v1";
+        if (!localStorage.getItem(rockyUpdateVersion)) {
+          normalized = normalized.map((animal) => animal.id === 9 && animal.name === "Rocky" ? { ...animal, breed: "Boxer", age: "2 meses" } : animal);
+          saveLocal(normalized);
+          localStorage.setItem(rockyUpdateVersion, "true");
         }
         // Elimina a Pelusa de catálogos guardados en navegadores que ya tenían datos anteriores.
         const pelusaRemovalVersion = "huellas_remove_pelusa_v1";
