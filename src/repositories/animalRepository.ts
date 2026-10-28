@@ -1,9 +1,6 @@
 import type { Animal, AnimalFormData } from "../types/animal";
 
 const STORAGE_KEY = "huellas_animals";
-const TABLE = "animals";
-const BUCKET = "animal-photos";
-
 const initialAnimals: Animal[] = [
   { id: 1, name: "Milo", type: "Perro", breed: "Mestizo/a", age: "2 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=900&q=85", story: "Curioso, cariñoso y siempre listo para una aventura.", tags: ["Sociable", "Energético"], healthCare: ["Desparasitación registrada", "Control veterinario realizado"] },
   { id: 3, name: "Bruno", type: "Perro", breed: "Doberman en miniatura", age: "4 años", size: "Pequeño", location: "Sucre, Bolivia", image: "/images/download.jpg", story: "Noble y leal; ya realizó una consulta veterinaria y está desparasitado. Busca una familia con mucho amor.", tags: ["Cariñoso", "Paseos"], healthCare: ["Consulta veterinaria realizada", "Desparasitación realizada"] },
@@ -16,58 +13,6 @@ const initialAnimals: Animal[] = [
   { id: 11, name: "Max", type: "Perro", breed: "Labrador mestizo", age: "5 años", size: "Grande", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=900&q=85", story: "Un compañero noble que disfruta la compañía y los paseos tranquilos.", tags: ["Noble", "Paseos"], healthCare: [] },
   { id: 12, name: "Mora", type: "Gato", breed: "Mestiza", age: "1 año", size: "Pequeño", location: "Sucre, Bolivia", image: "/images/7d58b216-c792-4e55-ae6f-463fd29bf375.jpg", story: "Dulce y observadora, está lista para descubrir un nuevo hogar a su ritmo.", tags: ["Dulce", "Curiosa"], healthCare: [] },
 ];
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-export const isCloudCatalogEnabled = Boolean(supabaseUrl && supabaseKey);
-
-type AnimalRow = {
-  id: number;
-  name: string;
-  type: Animal["type"];
-  breed?: string;
-  age: string;
-  size: string;
-  location: string;
-  image: string;
-  story: string;
-  tags: string[];
-  health_care?: string[];
-};
-
-function toAnimal(row: AnimalRow): Animal {
-  return { ...row, breed: row.breed || "Mestizo/a", id: Number(row.id), tags: Array.isArray(row.tags) ? row.tags : [], healthCare: Array.isArray(row.health_care) ? row.health_care : [] };
-}
-
-function headers(extra: Record<string, string> = {}): Record<string, string> {
-  if (!supabaseKey) throw new Error("Falta configurar VITE_SUPABASE_ANON_KEY.");
-  return { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, ...extra };
-}
-
-async function cloudRequest(path: string, init: RequestInit = {}): Promise<Response> {
-  if (!supabaseUrl || !supabaseKey) throw new Error("Falta configurar Supabase. Revisa el archivo .env.local y la guía de configuración.");
-  const response = await fetch(`${supabaseUrl}${path}`, { ...init, headers: headers({ ...(init.headers as Record<string, string> | undefined) }) });
-  if (!response.ok) {
-    const details = await response.text();
-    throw new Error(`Supabase respondió ${response.status}: ${details || response.statusText}`);
-  }
-  return response;
-}
-
-async function uploadPhoto(image: string): Promise<string> {
-  if (!image.startsWith("data:image/")) return image;
-  const [metadata] = image.split(",");
-  const mimeType = metadata.match(/data:(.*?);base64/)?.[1] || "image/jpeg";
-  const extension = mimeType.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
-  const blob = await (await fetch(image)).blob();
-  const fileName = `${crypto.randomUUID()}.${extension}`;
-  await cloudRequest(`/storage/v1/object/${BUCKET}/${fileName}`, {
-    method: "POST",
-    headers: { "Content-Type": mimeType, "x-upsert": "true" },
-    body: blob,
-  });
-  return `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${fileName}`;
-}
 
 function readLocal(): Animal[] {
   try {
@@ -167,51 +112,22 @@ function saveLocal(animals: Animal[]): void {
 
 export const animalRepository = {
   async getAll(): Promise<Animal[]> {
-    if (!isCloudCatalogEnabled) return readLocal();
-    const response = await cloudRequest(`/rest/v1/${TABLE}?select=*&order=id.asc`);
-    const rows = await response.json() as AnimalRow[];
-    return rows.map(toAnimal);
+    return readLocal();
   },
 
   async create(data: AnimalFormData): Promise<Animal> {
-    if (!isCloudCatalogEnabled) {
-      const animals = readLocal();
-      const id = animals.reduce((max, animal) => Math.max(max, animal.id), 0) + 1;
-      const newAnimal: Animal = { ...data, id };
-      saveLocal([...animals, newAnimal]);
-      return newAnimal;
-    }
-    const { healthCare, ...animalData } = data;
-    const row = { ...animalData, health_care: healthCare ?? [], image: await uploadPhoto(data.image) };
-    const response = await cloudRequest(`/rest/v1/${TABLE}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Prefer: "return=representation" },
-      body: JSON.stringify(row),
-    });
-    const rows = await response.json() as AnimalRow[];
-    if (!rows[0]) throw new Error("La mascota se guardó, pero Supabase no devolvió su registro.");
-    return toAnimal(rows[0]);
+    const animals = readLocal();
+    const id = animals.reduce((max, animal) => Math.max(max, animal.id), 0) + 1;
+    const newAnimal: Animal = { ...data, id };
+    saveLocal([...animals, newAnimal]);
+    return newAnimal;
   },
 
   async update(updatedAnimal: Animal): Promise<void> {
-    if (!isCloudCatalogEnabled) {
-      saveLocal(readLocal().map((animal) => animal.id === updatedAnimal.id ? updatedAnimal : animal));
-      return;
-    }
-    const { id, healthCare, ...data } = updatedAnimal;
-    const row = { ...data, health_care: healthCare ?? [], image: await uploadPhoto(data.image) };
-    await cloudRequest(`/rest/v1/${TABLE}?id=eq.${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Prefer: "return=minimal" },
-      body: JSON.stringify(row),
-    });
+    saveLocal(readLocal().map((animal) => animal.id === updatedAnimal.id ? updatedAnimal : animal));
   },
 
   async remove(id: number): Promise<void> {
-    if (!isCloudCatalogEnabled) {
-      saveLocal(readLocal().filter((animal) => animal.id !== id));
-      return;
-    }
-    await cloudRequest(`/rest/v1/${TABLE}?id=eq.${id}`, { method: "DELETE", headers: { Prefer: "return=minimal" } });
+    saveLocal(readLocal().filter((animal) => animal.id !== id));
   },
 };
