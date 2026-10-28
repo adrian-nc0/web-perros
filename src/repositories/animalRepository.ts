@@ -11,6 +11,14 @@ const initialAnimals: Animal[] = [
   { id: 4, name: "Nala", type: "Gato", breed: "Mestizo/a", age: "3 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=900&q=85", story: "Dulce e independiente, con un ronroneo inolvidable.", tags: ["Mimos", "Adaptable"], healthCare: ["Desparasitación registrada"] },
   { id: 5, name: "Toby", type: "Perro", breed: "Labrador Retriever", age: "8 meses", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85", story: "Un pequeño explorador que llenará tu casa de alegría.", tags: ["Cachorro", "Juguetón"], healthCare: ["Vacunación registrada", "Desparasitación registrada"] },
   { id: 6, name: "Simba", type: "Gato", breed: "Siamés", age: "2 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=85", story: "Observador y afectuoso cuando gana confianza.", tags: ["Curioso", "Interior"] },
+  { id: 7, name: "Canela", type: "Perro", breed: "Mestiza", age: "1 año", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=900&q=85", story: "Amigable y juguetona; disfruta los paseos y conocer gente nueva.", tags: ["Juguetona", "Sociable"], healthCare: [] },
+  { id: 8, name: "Pelusa", type: "Gato", breed: "Doméstico de pelo largo", age: "8 meses", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=900&q=85", story: "Una gatita curiosa que busca un hogar paciente y lleno de cariño.", tags: ["Curiosa", "Cariñosa"], healthCare: [] },
+  { id: 9, name: "Rocky", type: "Perro", breed: "Mestizo", age: "3 años", size: "Grande", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1561036142-2fcd6c7c2f4f?auto=format&fit=crop&w=900&q=85", story: "Tranquilo y atento, ideal para una familia que disfrute compartir tiempo al aire libre.", tags: ["Tranquilo", "Compañero"], healthCare: [] },
+  { id: 10, name: "Michi", type: "Gato", breed: "Doméstico de pelo corto", age: "2 años", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=85", story: "Le encanta explorar rincones cómodos y descansar cerca de sus personas favoritas.", tags: ["Independiente", "Hogar"], healthCare: [] },
+  { id: 11, name: "Max", type: "Perro", breed: "Labrador mestizo", age: "5 años", size: "Grande", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=85", story: "Un compañero noble que disfruta la compañía y los paseos tranquilos.", tags: ["Noble", "Paseos"], healthCare: [] },
+  { id: 12, name: "Mora", type: "Gato", breed: "Mestiza", age: "1 año", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=85", story: "Dulce y observadora, está lista para descubrir un nuevo hogar a su ritmo.", tags: ["Dulce", "Curiosa"], healthCare: [] },
+  { id: 13, name: "Bobby", type: "Perro", breed: "Mestizo", age: "6 meses", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85", story: "Un cachorro lleno de energía que necesita compañía, juegos y aprendizaje.", tags: ["Cachorro", "Activo"], healthCare: [] },
+  { id: 14, name: "Nube", type: "Gato", breed: "Doméstico de pelo corto", age: "4 años", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=900&q=85", story: "Serena y adaptable; sueña con una casa tranquila donde sentirse segura.", tags: ["Serena", "Adaptable"], healthCare: [] },
 ];
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
@@ -70,10 +78,23 @@ function readLocal(): Animal[] {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved) as Animal[];
-      if (Array.isArray(parsed)) return parsed.map((animal) => {
-        const sample = initialAnimals.find((demo) => demo.id === animal.id && demo.name === animal.name && demo.image === animal.image);
-        return { ...animal, breed: animal.breed || "Mestizo/a", healthCare: animal.healthCare ?? sample?.healthCare ?? [] };
-      });
+      if (Array.isArray(parsed)) {
+        const normalized = parsed.map((animal) => {
+          const sample = initialAnimals.find((demo) => demo.id === animal.id && demo.name === animal.name && demo.image === animal.image);
+          return { ...animal, breed: animal.breed || "Mestizo/a", healthCare: animal.healthCare ?? sample?.healthCare ?? [] };
+        });
+        // Agrega los nuevos ejemplos una sola vez en navegadores que ya tenían el catálogo guardado.
+        const seedVersion = "huellas_animals_seed_v2";
+        if (!localStorage.getItem(seedVersion)) {
+          const existingIds = new Set(normalized.map((animal) => animal.id));
+          const additions = initialAnimals.filter((animal) => animal.id >= 7 && !existingIds.has(animal.id));
+          const migrated = [...normalized, ...additions];
+          saveLocal(migrated);
+          localStorage.setItem(seedVersion, "true");
+          return migrated;
+        }
+        return normalized;
+      }
     }
   } catch {
     // El almacenamiento local puede estar bloqueado por el navegador.
