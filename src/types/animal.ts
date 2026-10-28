@@ -4,6 +4,7 @@ export interface Animal {
   id: number;
   name: string;
   type: AnimalType;
+  sex: "Macho" | "Hembra";
   breed: string;
   age: string;
   size: string;
