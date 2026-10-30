@@ -10,7 +10,7 @@ const initialAnimals: Animal[] = [
   { id: 7, name: "Canela", type: "Perro", sex: "Hembra", breed: "Mestiza", age: "1 año", size: "Mediano", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=85", story: "Amigable y juguetona; disfruta los paseos y conocer gente nueva.", tags: ["Juguetona", "Sociable"], healthCare: [] },
   { id: 9, name: "Rocky", type: "Perro", sex: "Macho", breed: "Boxer", age: "2 meses", size: "Grande", location: "Sucre, Bolivia", image: "/images/7fb44a67-49bc-4c5c-b9d5-564ddebc9d22.jpg", story: "Tranquilo y atento, ideal para una familia que disfrute compartir tiempo al aire libre.", tags: ["Tranquilo", "Compañero"], healthCare: [] },
   { id: 10, name: "Michi", type: "Gato", sex: "Macho", breed: "Persa", age: "2 años", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=900&q=85", story: "Le encanta explorar rincones cómodos y descansar cerca de sus personas favoritas.", tags: ["Independiente", "Hogar"], healthCare: [] },
-  { id: 11, name: "Max", type: "Perro", sex: "Macho", breed: "Labrador mestizo", age: "5 años", size: "Grande", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=900&q=85", story: "Un compañero noble que disfruta la compañía y los paseos tranquilos.", tags: ["Noble", "Paseos"], healthCare: [] },
+  { id: 11, name: "Max", type: "Perro", sex: "Macho", breed: "Pug", age: "5 años", size: "Pequeño", location: "Sucre, Bolivia", image: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=900&q=85", story: "Un compañero noble que disfruta la compañía y los paseos tranquilos.", tags: ["Noble", "Paseos"], healthCare: [] },
   { id: 12, name: "Mora", type: "Gato", sex: "Hembra", breed: "Mestiza", age: "1 año", size: "Pequeño", location: "Sucre, Bolivia", image: "/images/7d58b216-c792-4e55-ae6f-463fd29bf375.jpg", story: "Dulce y observadora, está lista para descubrir un nuevo hogar a su ritmo.", tags: ["Dulce", "Curiosa"], healthCare: [] },
 ];
 
@@ -101,6 +101,13 @@ function readLocal(): Animal[] {
           saveLocal(migrated);
           localStorage.setItem(seedVersion, "true");
           return migrated;
+        }
+        // Actualiza la raza y el tamaño de Max en catálogos guardados previamente.
+        const maxUpdateVersion = "huellas_update_max_pug_small_v1";
+        if (!localStorage.getItem(maxUpdateVersion)) {
+          normalized = normalized.map((animal) => animal.id === 11 && animal.name === "Max" ? { ...animal, breed: "Pug", size: "Pequeño" } : animal);
+          saveLocal(normalized);
+          localStorage.setItem(maxUpdateVersion, "true");
         }
         return normalized;
       }
