@@ -7,9 +7,6 @@ import type { Animal, AnimalFormData, AnimalType } from "../types/animal";
 
 type AdminSection = "resumen" | "mascotas";
 
-const dogBreeds = ["Mestizo/a", "Labrador Retriever", "Pastor Alemán", "Golden Retriever", "Caniche / Poodle", "Bulldog", "Beagle", "Chihuahua", "Husky Siberiano", "Rottweiler", "Boxer", "Dálmata", "Shih Tzu", "Dachshund / Salchicha", "Pitbull", "Border Collie", "Cocker Spaniel", "Otro / No identificado"];
-const catBreeds = ["Mestizo/a", "Doméstico de pelo corto", "Doméstico de pelo largo", "Siamés", "Persa", "Maine Coon", "Bengalí", "Angora", "Ragdoll", "British Shorthair", "Esfinge", "Azul Ruso", "Otro / No identificado"];
-
 const emptyForm: AnimalFormData = {
   name: "",
   type: "Perro",
@@ -228,8 +225,8 @@ function AdminPage() {
               <div className="admin-form-grid">
                 <label>Nombre<input required maxLength={50} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Ej. Canela" /></label>
                 <label>Sexo<select value={form.sex} onChange={(event) => setForm({ ...form, sex: event.target.value as "Macho" | "Hembra" })}><option value="Macho">Macho</option><option value="Hembra">Hembra</option></select></label>
-                <label>Especie<select value={form.type} onChange={(event) => { const type = event.target.value as AnimalType; setForm({ ...form, type, breed: type === "Perro" ? dogBreeds[0] : catBreeds[0] }); }}><option>Perro</option><option>Gato</option></select></label>
-                <label>Raza<select value={form.breed || "Mestizo/a"} onChange={(event) => setForm({ ...form, breed: event.target.value })}>{(form.type === "Perro" ? dogBreeds : catBreeds).map((breed) => <option key={breed} value={breed}>{breed}</option>)}</select></label>
+                <label>Especie<select value={form.type} onChange={(event) => { const type = event.target.value as AnimalType; setForm({ ...form, type }); }}><option>Perro</option><option>Gato</option></select></label>
+                <label>Raza<input required maxLength={80} value={form.breed} onChange={(event) => setForm({ ...form, breed: event.target.value })} placeholder="Escribe la raza o indica mestizo/a" /></label>
                 <label>Edad aproximada<input required value={form.age} onChange={(event) => setForm({ ...form, age: event.target.value })} placeholder="Ej. 1 año" /></label>
                 <label>Tamaño<select value={form.size} onChange={(event) => setForm({ ...form, size: event.target.value })}><option>Pequeño</option><option>Mediano</option><option>Grande</option></select></label>
                 <div className="wide admin-photo-field">
